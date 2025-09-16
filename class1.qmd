@@ -240,7 +240,7 @@ To study this issue, we can look at data from the ANES. The ANES is a nation-wid
 
 ```
 
-2. Create a new variable named anes_vep_diff that computes the difference between the actual turnout rate (VEP_turnout) and ANES estimates of the turnout rate for each year. 
+2. Create a new variable named anes_vep_diff that computes the difference between the actual turnout rate (VEP_turnout) and ANES estimates of the turnout rate for each year. To do this, subtract one variable from the other, and save this as a new variable using <-
 
 ```{r}
 # Notice that the ANES_turnout variable is on a different scale, where 50= 50%. So we need to multiply the previous variable we created by 100
