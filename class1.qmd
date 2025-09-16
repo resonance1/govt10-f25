@@ -1,0 +1,239 @@
+---
+title: "Class 1"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Class Plan
+
+- Class information 
+- Project management with R / git 
+- Markdown
+- R tutorial: Basic operations
+- R tutorial: Variables
+- R tutorial: Data frames
+
+# Markdown
+
+Markdown allows us to format text. Markdown can be compiled directly into a Word file or an HTML file.
+
+For this class we only care about some basic formatting:
+
+**Bolding text** *Italicizing text*
+
+The **quick** brown fox jumps over the *startled* gopher
+
+# Creating a larger header
+
+## Creating a second level header
+
+## Why Notebooks?
+
+R Notebooks allow us to write text, write code and generate results within a single file. In this class all in-class assignments and homework assignments will be submitted using Markdown Notebooks.
+
+## How to write code within markdown
+
+When you see a white background you are writing text. You can use Markdown here. However we will also be interested in writing code to explore and summarize data. Code is placed in a *chunk.* Chunks start and end with three grave accents (the same key as the tilde): chunks are interactive and allow to you run code. When you execute code within the notebook, the results appear beneath the code. To run a chunk, press the *Run* button (play button) within the chunk.
+
+Multiply 5 and 10:
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+# NOTE: we cannot use markdown in code chunks.  Here # means that we are creating a comment (notes that are not executable code).  We are not creating a header.
+
+```
+
+Multiply 4 and 6, then square it
+
+```{r}
+
+```
+
+R also contains *functions*. For instance, the function sqrt() calculates a square root:
+
+```{r}
+
+```
+
+# On your own: Exercise 1
+
+Expanding this notebook, complete the following tasks:
+
+1)  Create two new code chunks below this text (using the green 'C' button in the top right).
+
+2)  In the first chunk, find the sum of 75, 83, 93, 34, 75 and 81 using math operators (+). Then try to find the sum using the function *sum()*. You can look up how to use the function *sum()* by typing ?sum in the console (bottom of your screen). Or ask Claude/GPT to show you how it works.
+
+3)  In the second chunk divide 75 by 5, then add 43 and then multiply 6 (use parentheses)
+
+# On your own: Exercise 2
+
+Using markdown, answer the following questions directly in this notebook:
+
+1)  Where are you from?
+2)  What is your class year?
+3)  What is your major/planned major?
+4)  Have you taken a statistics or a programming class before?
+5)  What is your favorite book or movie?
+
+When you've finished this, close your computer so I know when you're ready for the next part of the class.
+
+# As a class: Variables
+
+R can save information as a variable using the following syntax: *variable name <- value*
+
+Let's create a variable named my_variable, with the value of 13.
+
+```{r}
+
+```
+
+We can also use '=' to create a variable
+
+```{r}
+
+
+```
+
+Get the value of the variable *my_variable* by typing the variable name
+
+```{r}
+
+```
+
+There are some limits to variable names. Don't use spaces, or (most) punctuation. Dots, dashes, underscores are fine.
+
+```{r}
+
+
+```
+
+We can input variable names into functions. Let's take the natural log of *my_variable*
+
+Note: There are many helpful lists of functions online: <https://www.statmethods.net/management/functions.html>
+
+```{r}
+
+
+```
+
+Let's change the value of *my_variable* by overwriting it
+
+```{r}
+
+
+```
+
+Now let's copy the variable *my_variable* to a new variable called *my_variable2*
+
+```{r}
+
+
+```
+
+We can perform mathematical operations directly on variables
+
+```{r}
+
+
+```
+
+
+## String (text) variables
+
+We can also store text within variables by wrapping the text in double quotation marks (""). Let's create a new variable called my_text that contains the words "gov 10"
+
+```{r}
+
+
+```
+
+We can't perform mathematical operations on text
+
+```{r}
+
+
+```
+
+# Data frames
+
+Data frames are similar to a spreadsheet, and contain multiple observations (rows) and variables (columns). We'll also call them "data sets" in this course
+
+## Loading data frames
+
+For this class, all data are stored in .csv format. Let's load turnout.csv. There are two ways we can do this.
+
+A)  Sync git, then read in the file:
+
+```{r}
+turnout <- read.csv("class_data/turnout.csv")
+```
+
+B)  Download the file from the internet into your current directory and load it:
+
+```{r}
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/turnout.csv","turnout.csv")
+#turnout <- read.csv("turnout.csv")
+```
+
+## Data frames and variables
+
+We can see the variable names in our data frame using *names()*
+
+```{r}
+
+```
+
+We can select columns in a dataframe by name using the *$* operator. When using the *$ operator we place the name of the data frame to the left and the name of the variable to the right.
+
+Let's pull out the column *year*
+
+```{r}
+
+
+```
+
+We can run functions on columns:
+
+```{r}
+
+```
+
+
+To create a new column in our data frame, we can also use the *$* operator. If we pass it a single value, that value will be placed within every row.
+
+```{r}
+
+
+```
+
+We can also create variables that are combinations of existing variables in the dataset:
+
+```{r}
+
+```
+
+
+
+# Prepare for submission
+
+You will submit all assignments and problem sets as Markdown files. To create a markdown file, click the Render icon.
+
+# Check-in
+
+1.  On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class:
+2.  What was the easiest thing to understand?
+3.  What was the most difficult thing to understand?
+
+# Optional Resources
+
+Canvas > Files > "Data Analysis Chapter 1" - Covers using R and basic operations
