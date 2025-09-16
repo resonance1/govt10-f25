@@ -8,15 +8,21 @@ execute:
 # Class Plan
 
 - Class information 
-- Project management with R / git 
+- Project management with Rstudio / git 
 - Markdown
 - R tutorial: Basic operations
 - R tutorial: Variables
 - R tutorial: Data frames
 
-# Markdown
+# Rstudio intro
 
-Markdown allows us to format text. Markdown can be compiled directly into a Word file or an HTML file.
+# R notebooks
+
+R Notebooks allow us to write text, write code and generate results within a single file. In this class all in-class assignments and homework assignments will be submitted using Markdown Notebooks (qmd).
+
+Markdown allows us to include code and format text. Markdown can be compiled directly into a Word file or an HTML file.
+
+# Markdown
 
 For this class we only care about some basic formatting:
 
@@ -27,10 +33,6 @@ The **quick** brown fox jumps over the *startled* gopher
 # Creating a larger header
 
 ## Creating a second level header
-
-## Why Notebooks?
-
-R Notebooks allow us to write text, write code and generate results within a single file. In this class all in-class assignments and homework assignments will be submitted using Markdown Notebooks.
 
 ## How to write code within markdown
 
@@ -65,7 +67,7 @@ R also contains *functions*. For instance, the function sqrt() calculates a squa
 
 ```
 
-# On your own: Exercise 1
+# Group work: Exercise 1
 
 Expanding this notebook, complete the following tasks:
 
@@ -181,13 +183,19 @@ turnout <- read.csv("class_data/turnout.csv")
 B)  Download the file from the internet into your current directory and load it:
 
 ```{r}
-#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/turnout.csv","turnout.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/turnout.csv","turnout.csv")
 #turnout <- read.csv("turnout.csv")
 ```
 
 ## Data frames and variables
 
 We can see the variable names in our data frame using *names()*
+
+```{r}
+
+```
+
+We can pull out the first few rows using *head()*
 
 ```{r}
 
@@ -208,25 +216,52 @@ We can run functions on columns:
 
 ```
 
-
 To create a new column in our data frame, we can also use the *$* operator. If we pass it a single value, that value will be placed within every row.
 
 ```{r}
 
-
 ```
 
-We can also create variables that are combinations of existing variables in the dataset:
+We can also create variables that are combinations of existing variables in the dataset. Let's create a variable called **VEP_turnout** that shows the actual turnout rate.
 
 ```{r}
 
 ```
+
+# Group work: Social desirability bias
+
+Surveys are frequently used to measure political behavior such as voter turnout, but some researchers are concerned about the accuracy of self-reporting. In particular, they worry about possible *social desirability bias*. In this phenomenon, respondents lie on surveys out of a desire to provide the 'socially correct' answer. In this case, those who did not vote in an election may report that they did.
+
+To study this issue, we can look at data from the ANES. The ANES is a nation-wide survey that has been conducted for every election since 1948. The ANES conducts face-to-face interviews with a nationally representative sample of adults.
+
+1. The variable we created, VEP_turnout, measures the actual turnout rate recorded by election authorities. Using this variable, what is the average turnout rate in the data? What is the median turnout rate? You may have to look up the functions for this. 
+
+```{r}
+
+```
+
+2. Create a new variable named anes_vep_diff that computes the difference between the actual turnout rate (VEP_turnout) and ANES estimates of the turnout rate for each year. 
+
+```{r}
+# Notice that the ANES_turnout variable is on a different scale, where 50= 50%. So we need to multiply the previous variable we created by 100
+
+```
+
+3. How large is the difference on average? 
+
+```{r}
+
+```
+
+4. What does this suggest about the prevalence of social desirability bias when it comes to reporting electoral behavior?
+
 
 
 
 # Prepare for submission
 
-You will submit all assignments and problem sets as Markdown files. To create a markdown file, click the Render icon.
+You will submit all assignments and problem sets as Markdown files. To create a markdown file, click the Render icon. 
+
 
 # Check-in
 
@@ -234,6 +269,12 @@ You will submit all assignments and problem sets as Markdown files. To create a 
 2.  What was the easiest thing to understand?
 3.  What was the most difficult thing to understand?
 
+# Before next class:
+
+Review this notebook!
+
 # Optional Resources
 
 Canvas > Files > "Data Analysis Chapter 1" - Covers using R and basic operations
+
+
