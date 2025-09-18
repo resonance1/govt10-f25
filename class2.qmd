@@ -1,0 +1,406 @@
+---
+title: "Class 2"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Class Plan
+
+* Review
+* Intro to tidyverse for dataset manipulation
+* Group work
+
+# Review
+
+Let's load the data from the last class:
+
+```{r}
+# Uncomment one of the options below to load your file.
+# Git
+turnout <- read.csv("class_data/turnout.csv")
+
+# Non-git
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/turnout.csv","turnout.csv")
+#turnout <- read.csv("turnout.csv")
+```
+
+## Saving vs outputting results
+
+```{r}
+mean(turnout$total_votes)
+```
+
+```{r}
+turnout$total_votes*1000
+```
+
+```{r}
+mean(turnout$total_votes)
+```
+
+```{r}
+turnout$total_votes <- turnout$total_votes*1000
+```
+
+```{r}
+mean(turnout$total_votes)
+```
+
+Let's recreate the VEP turnout variable from the group work, *inside* the turnout dataset
+
+```{r}
+turnout$VEP_turnout <- turnout$total_votes / turnout$VEP
+```
+
+Notice that this code is different from this, which creates the variable *outside* of the dataset:
+
+```{r}
+VEP_turnout <- turnout$total_votes / turnout$VEP
+```
+
+
+## Common mistakes
+
+Run-on code
+
+```{r}
+
+```
+
+Capitalization
+
+```{r}
+
+```
+
+Extra Spaces
+
+```{r}
+
+```
+
+
+## Group Work Review
+
+The variable we created, VEP_turnout, measures the actual turnout rate recorded by election authorities. Using this variable, what is the average turnout rate in the data? What is the median turnout rate? You may have to look up the functions for this.
+
+```{r}
+
+```
+
+Create a new variable named anes_vep_diff that computes the difference between the actual turnout rate (VEP_turnout) and ANES estimates of the turnout rate for each year. To do this, subtract one variable from the other, and save this as a new variable using <-
+
+```{r}
+# Notice that the ANES_turnout variable is on a different scale, where 50= 50%. So we need to multiply the previous variable we created by 100
+
+```
+
+How large is the difference on average?
+
+```{r}
+
+```
+
+
+# Tidyverse 
+
+## Pulling out specific columns and rows
+
+R has a package called tidyverse, which makes working with data frames easier. First, install tidyverse:
+
+```{r}
+install.packages("tidyverse")
+```
+
+Next, load the package. Note: This has to be run in each session BEFORE using any tidyverse commands. 
+
+```{r}
+library(tidyverse)
+```
+
+Tidyverse functions use the pipe command before a function: |>
+
+The |> select() function pulls in the columns that we want.
+
+The syntax is: dataframe |> select(column_name)
+
+```{r}
+
+
+```
+
+We can save the results as a new data frame:
+
+```{r}
+
+```
+
+One of the most useful functions is filter(), which returns just the rows that match some criteria. Let's filter to Presidential elections in the turnout dataset. To do so, we are going to use == to match a specific value. We use == rather than =
+
+The syntax is: dataframe |> filter(variable name == "something")
+
+```{r}
+
+```
+
+We can also use |> filter() to match numeric values. Let's match a specific year.
+
+```{r}
+
+```
+
+## Short Group work
+
+Using tidyverse and the filter() function, assess whether the difference between reported/actual turnout (turnout$anes_vep_diff) is larger or smaller for presidential versus midterm elections
+
+```{r}
+# You will need to run filter() twice, one for each type of election, and save the results in a new dataset. Then calculate the mean
+
+
+```
+
+Briefly interpret the results. What do your findings suggest about social desirability bias?
+
+
+# Manipulating Data frames
+
+# Creating variables with tidyverse commands
+
+Another way to create a variable without writing turnout$ over again is to use the |> mutate() function.
+
+Let's recreate the anes_vep_diff variable using |> mutate()
+
+```{r}
+
+turnout |> mutate()
+
+```
+
+To save the changes made by |> mutate(), we need to overwrite the original data frame
+
+```{r}
+
+```
+
+The advantage of mutate() is that you can create multiple variables at once
+
+```{r}
+
+```
+
+## Removing specific columns
+
+If we want to get rid of a column, we can put "-" in front of the column name when running select(). Let's return the data frame, removing the *VEP* column.
+
+```{r}
+
+```
+
+## More filtering
+
+Let's filter the dataset to all years after 1990. To do this, we have to use the > operator within filter().
+
+```{r}
+
+```
+
+We can also use >= or <=
+
+```{r}
+
+```
+
+If we want to exclude something, we use '!=' Let's exclude the 1984 observation.
+
+```{r}
+
+```
+
+
+## Handling missing data
+
+R uses the value _NA_ to indicate missing data. Missing data will cause many functions to fail.
+
+Let's place some missing data in our data frame.
+
+```{r}
+
+turnout$VEP_turnout[1] <- NA
+```
+
+Now, let's take the average of *VEP_turnout* using mean():
+
+```{r}
+mean(turnout$VEP_turnout)
+
+```
+
+For most functions, we can pass an additional argument to instruct R to ignore NAs, called na.rm=T
+
+```{r}
+
+```
+
+## Summary statistics and chaining
+
+We can also use |> summarize() to return summary statistics. To use summarize(), we place the the summary statistic function inside the parentheses: |> summarize(function(column)) 
+
+```{r}
+
+midterms <- turnout |> filter(type=="Midterm")
+
+
+midterms |> summarize(mean(VEP_turnout))
+
+mean(midterms$VEP_turnout)
+
+```
+
+This is not super efficient. But with tidyverse, we can also do multiple pipe operations at once. They always execute from left to right:
+
+dataset |> function1 |> function2
+
+Let's do the filtering and the summarize in one step:
+
+```{r}
+
+```
+
+We can also do multiple operations at once. Let's get both the median and the mean:
+
+```{r}
+
+```
+
+
+# Working with datasets and AI
+
+To work with AI efficiently, you need to tell it what your data looks like. The most efficient way is to provide the results of |> glimpse()
+
+Let's use |> glimpse() on the turnout dataset
+
+```{r}
+
+
+```
+
+Prompts are important! You need to provide as much context as possible. 
+
+I am working in R and tidyverse. I have a dataset called turnout that looks like this. Can you show me how to get the mean and the median of VEP_turnout, separately for type "Presidential" and type "Midterm", explaining what each step of the code does? 
+
+
+# Group Work -- Please complete before submitting the notebook
+
+NOTE: For all of these problems, please only seek AI assistance after first attempting the answer yourself. Working through the code yourself is an important part of the learning process; you can use AI to ensure that you don't get stuck, but it should not substitute for learning the basic operations. If you use AI from the beginning, you will likely find the quiz overly difficult. 
+
+
+Prior to the Syrian refugee crisis in 2015, many European political parties were already capitalizing on the perception that immigration to Europe had reached unsustainable levels. To investigate this trend, we will draw on demographic data provided by Eurostat. 
+
+```{r}
+# Git
+foreignpop <-  read.csv("class_data/foreignpopulation.csv")
+
+# Non-git
+download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/foreignpopulation.csv","foreignpopulation.csv")
+foreignpop <- read.csv("foreignpopulation.csv")
+
+```
+
+The dataset contains 6 columns:
+
+country                 Country name
+foreign_2011            Number of foreign-born residents in 2011
+foreign_2015            Number of foreign-born residents in 2015
+population_2011         Total number of residents in 2011
+population_2015         Total number of residents in 2015
+western                 1 if the country is traditionally in Western Europe (non-communist), 0 otherwise
+
+1.1 Use |> mutate() to create two new variables *in the data frame*: pctforeign_2011 and pctforeign_2015. These variables should contain the percentage of each country's population that is foreign-born in each year (i.e. foreign-born population divided by the total population). *Remember to overwrite the original data frame to save the results.*
+
+```{r}
+
+```
+
+1.2 Create a new variable *in the dataframe*, delta_pctforeign, that measures the percentage point change in each country's foreign born population between 2011 and 2015. You can do this by subtracting the pctforeign_2015 variable from the pctforeign_2011 variable.
+
+```{r}
+
+```
+
+1.3 What is the average change, across all countries, in the percentage of foreign population between 2011 and 2015? What is the median change? 
+
+```{r}
+
+```
+
+1.4 Let's exclude countries with very small populations. Filter the data frame to only include countries with more than 5 million residents in 2015. Then recalculate the answer to 1.3. You can either save a new version of the dataframe (with a different name), or use chaining.
+
+```{r}
+
+```
+
+1.5 Let's look at only those countries in Western Europe. Using the original version of the dataframe (unfiltered by population), filter the data to Western European countries and recalculate your answer to 1.3. You can either save a new version of the dataframe  (with a different name), or use chaining.
+
+```{r}
+
+
+```
+
+1.6 Lastly, let's look at only countries NOT in Western Europe. What is the average change in the percentage of foreign population between 2011 and 2015?
+
+```{r}
+
+```
+
+
+Load the following dataset on state-level election results:
+
+```{r}
+# Git
+state_election <-  read.csv("class_data/state_voting_patterns.csv")
+
+# Non-git
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/state_voting_patterns.csv","state_voting_patterns.csv")
+#state_election <- read.csv("state_voting_patterns.csv")
+
+```
+
+2.1 In the dataset, what is the average vote share for the Republican party *in each region*?
+Hint: Use group_by() and summarize() to obtain your answer
+
+```{r}
+
+```
+
+2.2 What is the average vote share for the Republican party, by region, in the 2020 election? 
+Hint: Use filter(), group_by(), and summarize() to obtain your answer
+
+```{r}
+
+```
+
+
+## Optional Resources
+
+Review:
+https://datacarpentry.github.io/R-ecology-lesson/working-with-data.html 
+  - Review basic tidyverse commands we've covered so far
+  
+Prepare for Tuesday:
+
+https://jhudatascience.org/tidyversecourse/wrangle-data.html#filtering-data
+  - Read about filtering for two conditions at once
+  
+https://jhudatascience.org/tidyversecourse/wrangle-data.html#grouping-data
+  - Read about the group_by() function
+ 
+Canvas --> Files/ Book Chapters/ Data Analysis, Chapter 2
+  - Read about causality
+
+
+# Check-in
+
+1.  On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class:
+2.  What was the easiest thing to understand?
+3.  What was the most difficult thing to understand?
