@@ -1,0 +1,199 @@
+---
+title: "Class 3"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Plan
+
+* Quiz discussion
+* Review
+* Lecture: Intro to Causation
+* R work: More grouping and filtering
+* Lecture: Randomization
+* Randomization demonstration
+
+```{r}
+library(tidyverse)
+
+# Git
+foreignpop <-  read.csv("class_data/foreignpopulation.csv")
+
+# Non-git
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/foreignpopulation.csv","foreignpopulation.csv")
+#foreignpop <- read.csv("foreignpopulation.csv")
+```
+
+# Review
+
+Use |> mutate() to create two new variables within the data frame: pctforeign_2011 and pctforeign_2015. These variables should contain the percentage of each country's population that is foreign-born in each year.
+
+```{r}
+foreignpop <- foreignpop |> mutate(pctforeign_2011 = foreign_2011/population_2011, 
+                                   pctforeign_2015 = foreign_2015/population_2015)
+
+# Compare to:
+foreignpop$pctforeign_2011 = foreignpop$foreign_2011/foreignpop$population_2011
+foreignpop$pctforeign_2015 = foreignpop$foreign_2015/foreignpop$population_2015
+      
+```
+
+Create a new variable in the data frame, delta_pctforeign, that measures the percentage point change in each country's foreign born population between 2011 and 2015. 
+
+Rescale the number so that 10=10%
+
+```{r}
+
+```
+
+What is the average change, across all countries, in the percentage of foreign population between 2011 and 2015? What is the median change? 
+
+```{r}
+
+```
+
+Ways to address missing data:
+
+```{r}
+
+```
+
+
+# Lecture: Intro to causation
+
+## A controlled study
+
+Does racial discrimination exist in the labor market? Or, should racial disparities in the unemployment rate be attributed to other factors such as racial gaps in educational attainment? To answer this question, two social scientists conducted the following experiment.
+
+In response to newspaper ads, the researchers sent out resumes of fictitious job candidates to potential employers. They varied only the names of the job applicants while leaving the other information in the resumes unchanged. For some resumes, stereotypically black- sounding names such as Lakisha Washington or Jamal Jones were used, whereas other resumes contained typically white-sounding names such as Emily Walsh or Greg Baker. The researchers then compared the callback rates between these two groups of resumes and examined whether the resumes with typical black names received fewer callbacks than those with stereotypically white names. The positions to which the applications were sent were either in sales, administrative support, clerical, or customer services.
+
+| Name      | Description                                 |
+|-----------|---------------------------------------------|
+| firstname | first name of fictitious job applicant      |
+| sex       | sex of applicant (female or male)           |
+| race      | race of applicant (black or white)          |
+| call      | whether a callback was made (1= yes, 0= no) |
+
+```{r}
+resume <- read.csv("./class_data/resume.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/resume.csv","resume.csv")
+#resume <- read.csv("resume.csv")
+
+```
+
+Let's get the average callback rate in the data. Note that the average of a binary variable (1s or 0 s) is the same as the proportion of 1's. 
+
+```{r}
+
+
+```
+
+The question we care about, however, is whether this differs based on the signaled race.
+
+We could do this by filtering the dataset. However, there is an faster way to do this.
+
+First, we need to |> group_by() the characteristic we are interested in. Then, we will take the average of "call" using summarize()
+
+```{r}
+
+```
+
+
+## More Filtering in R
+
+We often want to subset on multiple criteria.  To do this we need to two new operands:
+
+ & and  
+ | or 
+
+Assess the callback rate for black females
+
+```{r}
+
+```
+
+Assess the callback rate for resumes that are white or male
+
+```{r}
+
+```
+
+## Short group work
+
+Find the average callback rate for each firstname
+
+```{r}
+
+```
+
+Calculate the callback rate for those that are female or black
+
+```{r}
+
+```
+
+Compare the callback rate for black females versus white females
+
+```{r}
+
+```
+
+
+# Lecture: Causality / Randomization 
+
+
+# Simulating the effects of randomization (demonstration only - you do *not* need to know this code)
+
+Initialize
+
+```{r}
+nrows <- 10000
+age <- round(rnorm(10000,mean=40,sd=10))
+college <- rbinom(10000,1,.38)
+hair <- c(rep("brown",4000),rep("blonde",1000),rep("red",250),rep("black",4750))
+handshake10k <- data.frame(age,college,hair)
+```
+
+Randomize
+
+```{r}
+handshake10k$treatment <- 0
+randomsample <- sample(1:nrow(handshake10k),5000)
+handshake10k$treatment[randomsample] <- 1
+```
+
+## Validating the design
+
+Let's check how accurate randomization was. Compare the mean value of age and college between the groups:
+
+```{r}
+
+
+```
+
+We can use n() to count. Let's count the total number of hair colors, separately for treated and control
+
+```{r}
+
+```
+
+Visualize Law of Large Numbers via flipping a fair coin (you don't need to know this code!)
+
+```{r}
+n <- 50000
+x <- sample(0:1,n, repl=T)
+s <- cumsum(x)
+r <- s/(1:n)
+plot(r, ylim=c(0, 1), type="l")
+lines(c(0,n), c(.50,.50),col="red")
+round(cbind(x,s,r), 5)[1:10,]; r[n]
+```
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand?
