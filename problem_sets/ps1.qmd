@@ -1,0 +1,148 @@
+---
+title: "Problem Set 1"
+format: docx
+execute:
+  error: TRUE
+---
+
+If you work in a group (max size, 3), please give the name of your group members at the top.
+
+Reminder: AI assistance is allowed, but the purpose of this assignment is to learn by doing/practice. So please attempt problems first before using AI, and if you use AI, ask it to explain how things work to you so that you are well prepared for any exams. 
+
+# Demographic change and attitudes towards immigration (8 points)
+
+A researcher conducted a randomized field experiment assessing the extent to which individuals living in suburban communities around Boston, Massachusetts changed their views in response to perceived demographic change.
+
+Subjects in the experiment were individuals riding on the commuter rail line and overwhelmingly white. Every morning, multiple trains pass through various stations in suburban communities that were used for this study. For pairs of trains leaving the same station at roughly the same time, one was randomly assigned to receive the treatment and one was designated as a control.
+
+The treatment in this experiment was the presence of Latino 'confederates' (a term used in experiments to indicate that these individuals did not know the full purpose of the study at the time of their participation) on the platform prior to the train's arrival. The presence of these confederates at the train station was intended by the researchers to emulate the kind of demographic change anticipated for the United States in coming years.
+
+For individuals in the control group, no such confederates were present on the platform. For individuals in the treatment group, confederates were always present on their train platform.The study was administered for 10 days. Participants were asked questions related to immigration policy both before the study started and after the study had ended.
+
+The names and descriptions of relevant variables in the data set boston.csv are:
+
+| Name                  | Description                                                     |
+|-----------------------|-----------------------------------------------------------------|
+| age                   | Age of individual at time of experiment                                   
+| treatment             | Whether an individual was exposed to immigration and is in the treatment group (1) or (0) 
+| income                | Income group in dollars (not exact income)
+| male                  | Whether individual indicated they were male (1) or not (0)
+| white                 | Indicator variable for whether individual identifies as white (1) or not (0)
+| college               | Indicator variable for whether individual attended college (1) or not (0)
+| usborn                | Indicator variable for whether individual is born in the US (1) or not (0)
+| partisanship          | Self-reported political views, ranging from (1) Very Liberal to (5) Very Conservative
+| immig_after           | The outcome. Policy opinion on question about increasing the number of immigrants allowed in the country, on a scale 
+                        | from Oppose Increase (1) to Not Sure (3) to Support Increase (5). 
+
+```{r}
+library(tidyverse)
+
+boston <- read.csv("data/boston.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/boston.csv","boston.csv")
+#boston <- read.csv("boston.csv")
+
+```
+
+1.1. Calculate the average treatment effect of randomized exposure to diversity on attitudes towards immigration. 
+
+```{r}
+
+```
+
+1.2 Interpret the results
+
+*Answer here*
+
+1.3. Calculate the average treatment effects, for college vs. non-college educated respondents. 
+
+```{r}
+
+
+```
+
+1.4. In this study, the randomization (the coin flip) was not conducted for each participant, but rather occurred at the level of the train -- each train was assigned to different groups of individuals waiting in platforms. How accurate was this type of randomization in creating similar treatment and control groups? To answer this question, compare the average values of the treated and control groups for all background characteristics in the data.
+
+```{r}
+
+```
+
+1.5. Discuss the similarities and differences between the treated and control groups. Based on these results, how confident are you that the results of this study indicate a causal relationship between exposure to immigration and exclusionary attitudes?
+
+*Answer here*
+
+# Are assassinations a natural experiment? [10 pts]
+
+One longstanding debate in the study of international relations concerns the question of whether individual political leaders can make a difference. Some emphasize that leaders with different ideologies and personalities can significantly affect the course of a nation. Others argue that political leaders are severely constrained by historical and institutional forces.  
+
+The difficulty of empirically testing these arguments stems from the fact that the change of leadership is not random and there are many confounding factors to be adjusted for. In this exercise, we consider a purported *natural experiment* in which the authors of an academic study argue that the success or failure of assassination attempts is essentially random. For instance, if a fired bullet is slightly to the left, the leader might die, but if it is slightly to the right, it hits a non-essential organ and the leader lives. If there is a creaky floorboard or a squeaky door handle, the leader might hear the assassin in time to escape. In other words, the claim is that while an assassination _attempt_ is not random, the outcome is. The authors then use this random variation to test the effect of a leader *randomly* remaining in power on subsequent national and international-level outcomes. 
+
+```{r}
+library(tidyverse)
+
+leaders <- read.csv("./data/leaders.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/leaders.csv","leaders.csv")
+#leaders <- read.csv("leaders.csv")
+
+```
+
+| Name           | Description                                                                      |
+|----------------|----------------------------------------------------------------------------------|
+| country        | The name of the country                                                          |
+| year           | Year of assassination attempt                                                    |                                    
+| age            | Age of the targeted leader                                                       |
+| polity_before  | Average polity score during the 3 year period prior to the attempt               |
+| civilwar_before| 1 if country is in civil war during the 3 year period prior to the attempt, or 0 |
+| civilwar_after | 1 if country is in civil war during the 3 year period after the attempt, or 0    |
+| interwar_before| 1 if country is in international war during the 3 year period prior to the attem |
+| interwar_after | 1 if country is in international war during the 3 year period after the attempt, |
+| result         | Result of the assassination attempt, one of 10 categories                        |
+
+The polity variable represents the  *polity score* from the Polity Project.  The Polity Project systematically documents and quantifies the regime types of all countries in the world from 1800.  The polity score is a 21-point scale ranging from -10 (hereditary monarchy) to 10 (consolidated democracy).  
+
+2.1 Let's examine the distribution of the polity score variable. To do so, create a histogram for the variable *polity_before*. Based on the relationship of the median to the mean, is the distribution right-skewed or left-skewed?
+
+```{r}
+
+```
+
+2.2 Create a new binary variable in the dataset that is set to 1 if the attack resulted in the leaders death, and 0 otherwise. 
+
+```{r}
+
+```
+
+2.3 What proportion of attacks resulted in the leaders' death? 
+
+```{r}
+
+```
+
+2.4 How does a successful assassination attempt affect a country's likelihood of subsequently engaging in an international war? To assess this, evaluate the average treatment effect of a successful assassination attempt (calculated in the previous question) on the outcome variable: *interwar_after* 
+
+```{r}
+
+```
+
+2.5 Let's examine balance between the treated and control group in this natural experiment. Looking at the variables, determine which ones were measured before the treatment. Then for each of these, check whether they are similar, on average, between the treated and control groups. (Note: you can safely ignore any characteristics relating to country name or the leader's name).
+
+```{r}
+
+```
+
+2.6 Let's visualize the continuous distributions. Create boxplots of polity_before, separately for the treated and control groups. Now do the same for the age and civilwar_before measures. 
+
+```{r}
+
+
+```
+
+2.7 Given the results above, evaluate the quality of this natural experiment. Should we view the results as causal or correlational? 
+
+*Answer here*
+
+2.8 Let's say --- hypothetically --- that your previous results suggest that whether a leader lives or dies after an assassination attempt was initiated was not random. But at face value, one could argue that the authors' underlying logic in this study seems plausible. We can imagine, for instance, that Lee Harvey Oswald may have missed if he had simply had too much coffee right before the attempt and his hands were shaking. Looking carefully at the differences across background characteristics you see between the treated and control groups, what explanation might you provide to the authors as to why the outcome of the attempts may be non-random?  
+
+*Answer here*
+
