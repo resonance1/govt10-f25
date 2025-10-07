@@ -1,0 +1,283 @@
+---
+title: "Class 7"
+format: docx
+execute:
+  error: TRUE
+---
+
+```{r setup, echo=F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE)
+knitr::opts_chunk$set(error = TRUE)
+```
+
+# Plan
+* Announcements
+* Review
+* Lecture: Difference in Differences (DiD) Designs
+* Implementing DiD in R
+* Group Work
+* DiD with wide datasets
+* Plotting DiD
+
+# Pset
+
+```{r}
+
+boston <- read.csv("data/boston.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/boston.csv","boston.csv")
+#boston <- read.csv("boston.csv")
+
+```
+
+1.4. In this study, the randomization (the coin flip) was not conducted for each participant, but rather occurred at the level of the train -- each train was assigned to different groups of individuals waiting in platforms. How accurate was this type of randomization in creating similar treatment and control groups? To answer this question, compare the average values of the treated and control groups for all background characteristics in the data.
+
+```{r}
+boston |>
+  group_by(treatment)  |>
+  summarize(mean(age,na.rm=T),
+            mean(male,na.rm=T),
+            mean(income,na.rm=T),
+            mean(partisanship,na.rm=T),
+            mean(white,na.rm=T),
+            mean(college,na.rm=T),
+            mean(usborn,na.rm=T))
+```
+
+
+# Group work review
+
+```{r}
+library(tidyverse)
+
+british_mp <- read.csv("./class_data/MP.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/MP.csv","MP.csv")
+#british_mp <- read.csv("MP.csv")
+
+british_mp$victory <- ifelse(british_mp$margin > 0,1,0)
+british_mp_filter <- british_mp |> filter(margin >= -.035 & margin <= .035)
+
+```
+
+The more background characteristics we have to evaluate, the better. Convert the information in the 'school' variable to binary variables. Then assess differences between the treatment and control groups to determine the quality of the "as-if random" assumption. Do your conclusions change? Interpret the results. 
+
+```{r}
+table(british_mp_filter$school)
+
+
+british_mp_filter$eton <- ifelse(british_mp_filter$school == "Eton",1,0)
+british_mp_filter$public <- ifelse(british_mp_filter$school == "Public",1,0)
+british_mp_filter$regular <- ifelse(british_mp_filter$school == "Regular",1,0)
+
+
+british_mp_filter |> 
+  group_by(victory) |>
+  summarize(mean(eton),
+            mean(public),
+            mean(regular))
+
+```
+
+# Lecture: Difference in Differences
+
+# Difference in Differences in R
+
+We'll examine a canonical study that examined the employment effects of a minimum wage increase in NJ.
+
+```{r}
+library(tidyverse)
+minwage <- read.csv("./class_data/minwage.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/minwage.csv","minwage.csv")
+#minwage <- read.csv("minwage.csv")
+
+```
+
+Let's create three new variables in the dataset:
+
+a) The proportion of full-time workers before the reform
+b) The proportion of full-time workers after the reform
+c) The longitudinal difference between (a) and (b)
+ 
+
+```{r}
+
+minwage <- minwage |> mutate(prop_full_before=,
+                             prop_full_after=,
+                             long_diff=)
+
+
+```
+
+To make the subsequent code simpler, let's create two filtered data frames, one for NJ and one for PA
+
+```{r}
+  
+```
+
+Did wages change in NJ? Let's compare the distribution of min wage, before and after the reform. 
+
+```{r}
+
+```
+
+Difference in Differences Step 1: We need the average longitudinal difference of the outcome, for NJ and PA.
+
+```{r}
+
+```
+
+Difference in Differences Step 2: Subtract the Control group from the Treated group
+
+```{r}
+
+```
+
+Difference in Differences Step 3: Evaluate parallel trends
+
+```{r}
+# Can't - no data in dataset from an additional time period
+```
+
+
+# Group Work 1
+
+In many (but not all) states in Austria, voting in parliamentary elections was compulsory, punishable by fines. In 1992, the Federal Constitutional Court announced that this practice was unconstitutional and struck down the law. 
+
+We are interested in finding out whether the repeal of the law (and the accompanying reduction in turnout) reduced support for left-wing parties. States that were forced to abolish compulsory voting are considered the treatment group, while states that never enacted compulsory voting are in the control group. 
+
+Import the dataset using the following commands:
+
+```{r}
+austria <-  read.csv("./class_data/austria_long.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/austria_long.csv","austria_long.csv")
+#austria <- read.csv("austria_long.csv")
+
+```
+
+The dataset contains a partial sample of election results from Austrian municipalities, and includes following variables:
+
+name                    name of the municipality
+state                   name of the state
+treated                 1 if the state practiced compulsory voting prior to 1992, 0 otherwise
+year                    election year
+socialist_voteshare     the percentage of votes cast for the socialist party in an election year
+
+This data is in a slightly different format than the minwage data; it is saved in long format
+
+
+1. Use the difference-in-differences estimator to evaluate the effect of repealing compulsory voting on municipal-level vote share for the Socialist Party. Interpret the results -- was the repeal of compulsory voting associated with reduced support for the Socialist party? 
+
+ _Note: For this estimate, you should focus only on the elections held in 1990 (before) and 1994 (after), since the repeal occurred in 1992_ 
+ 
+_There are several ways to proceed with the code. One of the simplest approaches is to calculate 4 averages: treat_post, treat_pre, control_post, and control_pre, and then calculate the DiD as: (treat_post - treat_pre) - (control_post - control_pre). I've started this code for you below_
+
+```{r}
+treat_post <- austria |>
+filter(treated == 1 & year == xxxx) |>
+summarize(mean(socialist_voteshare, na.rm = T))
+
+treat_pre <- 
+
+control_post <-
+  
+control_pre <- 
+
+  
+(treat_post-treat_pre)-(control_post-control_pre)
+
+```
+
+2. To evaluate the parallel trends assumption, repeat the analysis from #1 using the years 1986 (before) and 1990 (after). The fastest way is to copy and paste your code, and change the years. The DiD estimate for the parallel trends test should be close to 0. Does the parallel trends assumption appear to hold in this case? What does that imply for causality?
+
+```{r}
+
+
+```
+
+
+# Long vs wide data
+
+There are two common formats for datasets that involve time.
+
+Long data encodes time as separate observations. Wide data encodes time as new variables. Let's examine the difference:
+
+```{r}
+
+library(tidyverse)
+
+austria_wide <- read.csv("./class_data/austria_wide.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/austria_wide.csv","austria_wide.csv")
+#austria_wide <- read.csv("austria_wide.csv")
+
+```
+
+## DiD with wide data
+
+```{r}
+
+# Step 1: Calculate longitudinal difference
+
+austria_wide <- austria_wide |> mutate(long_diff=)
+
+# Step 2: Get average of longitudinal difference for treatment vs control
+
+
+# Step 3: Parallel trends
+
+austria_wide <- austria_wide |> mutate(long_diff_parallel=)
+
+
+```
+
+
+# Plotting DiD
+
+It is often helpful to plot the trends when doing DiD problems. Here is how we do so. First, we need a long dataset. Then, create two new datasets that contain the average value of the outcome for each time period:
+
+```{r}
+
+treat.avg <- austria_long |> 
+            filter() |> 
+            group_by() |>
+            summarize(outcome=)
+
+control.avg <- 
+  
+
+```
+
+Next, use the plot(x=,y=,type="l") command to plot the time series.
+
+```{r}
+
+plot(x=treat.avg$year,y=treat.avg$outcome,type="l")
+
+```
+
+Let's adjust the vertical axis and add color:
+
+```{r}
+
+plot(x=treat.avg$year,y=treat.avg$outcome,type="l",ylim=c(.2,.5),col="")
+
+```
+
+We can overlay the other data by using lines(x=,y=)
+
+```{r}
+
+plot(x=treat.avg$year,y=treat.avg$outcome,type="l",ylim=c(.2,.5),col="")
+lines(x=,y=,col="")
+
+```
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand (leave blank if nothing)?
