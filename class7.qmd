@@ -23,8 +23,8 @@ knitr::opts_chunk$set(error = TRUE)
 # Pset
 
 ```{r}
-
-boston <- read.csv("data/boston.csv")
+library(tidyverse)
+boston <- read.csv("class_data/boston.csv")
 
 #download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/boston.csv","boston.csv")
 #boston <- read.csv("boston.csv")
