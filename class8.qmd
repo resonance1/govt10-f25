@@ -1,0 +1,174 @@
+---
+title: "Class 8"
+format: docx
+execute:
+  error: TRUE
+---
+
+```{r setup, echo=F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE)
+knitr::opts_chunk$set(error = TRUE)
+```
+
+# Plan
+* Quick Review: DiD for Long/Wide
+* Lecture: Correlation
+* Correlation in R
+* Break (10:47-10:57)
+* Quiz (11-12)
+
+# Quick Review
+
+```{r}
+library(tidyverse)
+austria <-  read.csv("./class_data/austria_long.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/austria_long.csv","austria_long.csv")
+#austria <- read.csv("austria_long.csv")
+
+austria_wide <- read.csv("./class_data/austria_wide.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/austria_wide.csv","austria_wide.csv")
+#austria_wide <- read.csv("austria_wide.csv")
+
+```
+
+Long
+
+```{r}
+treat_post <- austria |>
+filter(treated == 1 & year == 1994) |>
+summarize(mean(socialist_voteshare, na.rm = T))
+
+treat_pre <- austria |>
+filter(treated == 1 & year == 1990) |>
+summarize(mean(socialist_voteshare, na.rm = T))
+
+control_post <- austria |>
+filter(treated == 0 & year == 1994) |>
+summarize(mean(socialist_voteshare, na.rm = T))
+
+control_pre <-  austria |>
+filter(treated == 0 & year == 1990) |>
+summarize(mean(socialist_voteshare, na.rm = T))
+
+
+(treat_post-treat_pre)-(control_post-control_pre)
+
+```
+
+Wide
+
+```{r}
+
+# Single step
+
+austria_wide |> group_by(treated) |> summarize(long_diff=mean(y1994,na.rm=T)-mean(y1990,na.rm=T))
+
+-0.05289674	- -0.06189908
+
+```
+
+
+# Lecture: Correlation
+
+
+# Exploring descriptive relationships in data
+
+Correlations can provide helpful information to policymakers, by describing underlying patterns in the data and highlighting relationships worthy of further study.
+
+In this exercise, you will evaluate the factors that are correlated with arson attacks against refugee housing, using data from Germany in the years following the start of the Syrian refugee crisis (2014).
+
+```{r}
+arson <- read.csv("./class_data/arson.csv")
+
+#download.file("https://github.com/resonance1/govt10-f25/raw/refs/heads/main/class_data/arson.csv","arson.csv")
+#arson<- read.csv("arson.csv")
+
+```
+
+The dataset includes all regions that experienced at least one arson attack.
+
+Relevant variables:
+
+attack_rate                Outcome. Arson attacks on refugee housing, scaled by population
+region                     Region in Germany
+pop                        Population
+unemp                      Unemployment rate
+media                      Whether refugees received negative local media coverage, last 12 months (1 or 0)
+foreign                    Percentage of the population that is foreign-born
+foreign_change             Percentage point change in the foreign-born share over the last 10 years
+asylumseekers_2010         Asylum seekers per 1000 population, 2010
+asylumseekers_now          Asylum seekers per 1000 population, current data
+afd                        Support for the far-right AFD party, 2014
+protestant                 Share of the population that identifies as protestant
+catholic                   Share of the population that identifies as catholic
+male_female_ratio          Male/Female gender ratio
+pop_dens                   Population density
+east                       Whether the region is in East Germany (1) or not (0)
+npd                        Support for the neo-Nazi NPD party
+income_2014                Median income, 2014 (Euros)
+    
+
+Let's explore potential correlations between the attack rate and other variables using a scatter plot.
+
+```{r}
+y <- arson$attack_rate
+x <- 
+  
+plot(x,y)
+
+```
+
+We can add a trend line to the plot using lines(lowess(x,y))
+
+```{r}
+
+plot(x,y)
+lines(lowess(x,y))
+
+```
+
+We can also evaluate the correlation numerically using cor(x,y).
+
+If there is missing data, we do:  cor(x,y,use="complete.obs")
+
+```{r}
+
+cor(x,y)
+
+```
+
+Here is how correlation works:
+
+```{r}
+sum((x - mean(x)) * (y - mean(y))) / sqrt(sum((x - mean(x))^2) * sum((y - mean(y))^2))
+
+```
+
+
+# Group work
+
+With your neighbors, explore other correlations. Which factors are most strongly correlated with violent crime? Use a separate code chunks for each variable you explore. 
+
+```{r}
+```
+
+```{r}
+```
+
+```{r}
+```
+
+# As a full class: more on correlation 
+
+```{r}
+
+```
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand (leave blank if nothing)?
