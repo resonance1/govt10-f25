@@ -1,0 +1,240 @@
+---
+title: "Class 9"
+format: docx
+execute:
+  error: TRUE
+---
+
+```{r setup, echo=F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE)
+knitr::opts_chunk$set(error = TRUE)
+```
+
+# Plan
+
+* Announcements
+* Quiz review
+* Correlation
+* Standard Deviation 
+* Sampling Error
+* Sensitive Survey Questions
+
+# Quiz Review
+
+# Correlation
+
+```{r}
+library(tidyverse)
+arson <- read.csv("./class_data/arson.csv")
+
+#download.file("https://github.com/resonance1/govt10-f25/raw/refs/heads/main/class_data/arson.csv","arson.csv")
+#arson<- read.csv("arson.csv")
+
+```
+
+```{r}
+y <- arson$attack_rate
+x <- arson$foreign
+  
+plot(x,y)
+lines(lowess(x,y))
+
+cor(x,y,use="complete.obs")
+
+```
+
+## Correlation tables
+
+```{r}
+
+```
+
+# Short lecture: Standard Deviation
+
+## Standard deviation in R
+
+To calculate the standard deviation in R, we use the sd() function
+
+```{r}
+
+library(tidyverse)
+
+hsavings <- read.csv("./class_data/rosca.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/rosca.csv","rosca.csv")
+#hsavings <- read.csv("rosca.csv")
+
+control <- hsavings |> filter(tgroup=="Control")
+
+```
+
+Let's visualize this with a histogram:
+
+```{r}
+
+
+```
+
+We can use standard deviation to contextualize an ATE, by comparing the effect size to the standard deviation of the outcome in the control group:
+
+```{r}
+# ATE
+
+hsavings |> group_by(tgroup) |> summarize(mean(fol2_amtinvest,na.rm=T))
+
+408.2150	- 257.8333	
+
+```
+
+```{r}
+# Visual demonstration - don't worry about the code
+
+ate <- 150.3817
+
+control <- hsavings |> filter(tgroup=="Control")
+mean <- mean(control$fol2_amtinvest,na.rm=T)
+sd <- sd(control$fol2_amtinvest,na.rm=T)
+effect_1sd <- mean + sd
+effect_2sd <- mean + 2*sd
+
+hist(control$fol2_amtinvest,breaks=20)
+abline(v=,col="")
+
+
+```
+
+
+# Short Lecture: Measurement and Sampling Error
+
+
+## Sampling Error
+
+Supports Trump    = 1
+Does not support Trump = 0 
+
+The support for Trump in this particular state is 40%:
+
+```{r}
+state <- c(rep(1,40000),rep(0,60000))
+
+mean(state)
+
+```
+
+To take a sample, we use the _sample()_ function. The format is:
+
+  sample(whatwewanttosample,sizeofsample,replace=F)
+
+Let's draw a sample of size 10, and examine the mean.
+
+```{r}
+sample <- sample(state,10,replace=F)
+mean(sample)
+
+```
+
+Now let's draw new samples of 100 and 500, and compare the mean.
+
+```{r}
+sample <- sample(state,,replace=F)
+mean(sample)
+
+```
+
+Now let's draw a 1000 person sample. What is the expected error, using the equation covered in class?
+
+```{r}
+
+sample <- sample(state,1000,replace=F)
+
+```
+
+The error tells us how far off our sample mean will be from the population mean, on average. Technically, it gives us the standard deviation of the hypothetical sampling distribution: the standard deviation of all possible answers we could have received.
+
+To test whether our formula for the expected error works, let's draw 100 samples, each of size 1000. Then we'll plot the average value from each sample. A distribution of sample means is known as a *sampling distribution* 
+
+```{r}
+
+# You do not need to know this code
+n<-1000
+samples <- 100
+out <- c()
+for (i in 1:samples){
+  out <- c(out,mean(sample(state,n,replace=FALSE)))
+}
+
+hist(out)
+sd(out)
+mean(out)
+
+```
+
+### Practice question:
+
+A polling company randomly sampled 500 Americans to ask them if they approved supplying arms to Ukraine. On a scale of 1 to 5, where 1 meant "strongly oppose" and 5 meant "strongly support", the average response was 4.12. The standard deviation was 0.25. What was the expected error of this poll?
+
+```{r}
+
+```
+
+
+
+# Short Lecture: Other Sources of Polling Error
+
+Let's load a survey of Afghan citizens. 
+
+```{r}
+afghan <- read.csv("./class_data/afghan.csv") %>% filter(list.group!="ISAF")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/afghan.csv","afghan.csv")
+#afghan<- read.csv("afghan.csv") %>% filter(list.group!="ISAF")
+
+```
+
+One of the most common items individuals refuse to respond to in surveys are questions about income. How many fall into this category in the afghan survey?
+
+To determine this, we can use is.na() on the _income_ variable.
+
+```{r}
+
+```
+
+How does non-response vary by other characteristics? Let's create a variable that measures income non-response. Then let's examine how it varies as a function of employment
+
+```{r}
+
+
+```
+
+# Short Lecture: Sensitive Questions
+
+## Group Work: List Experiment (if time)
+
+Now let’s assess the list experiment. The relevant variables are:
+
+list.group      Whether respondents saw no sensitive items (Control), or a sensitive item stating that they support the Taliban
+list.response   Number of items on the list respondents agreed with
+
+1. What is the non-response rate to the list experiment?
+
+```{r}
+
+```
+
+2. What percentage of respondents supported the Taliban?
+
+```{r}
+
+
+```
+
+
+
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand (leave blank if nothing)?
