@@ -1,0 +1,212 @@
+---
+title: "Class 10"
+format: docx
+execute:
+  error: TRUE
+---
+
+```{r setup, echo=F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE)
+knitr::opts_chunk$set(error = TRUE)
+```
+
+# Plan
+
+* Quick review
+* Sensitive survey questions
+* Prediction
+
+# Review: Standard deviation vs standard error
+
+*Standard deviation* is a summary statistic that we apply to distributions. It indicates how far, on average, observations are from the mean.
+
+*Standard error* tells us how different our **sample** mean is likely to be from the true **population** mean. In other words, what is the expected error of our estimate? Technically, the standard error is the standard deviation of the (hypothetical) sampling distribution.
+
+# Recap: Sampling Distribution
+
+Create a population:
+
+```{r}
+state <- c(rep(1,40000),rep(0,60000))
+```
+
+Sample from the population, with a sample size (n) large enough for the Law of Large Numbers:
+
+```{r}
+sample <- sample(state,1000,replace=F)
+```
+
+The error tells us how far off our sample mean will be from the population mean, on average
+
+```{r}
+n <- 1000
+sd <- sd(sample)
+
+sd/sqrt(n)
+
+```
+
+This is the same as the standard deviation of the hypothetical sampling distribution: the standard deviation of all possible answers we could have received
+
+```{r}
+# You do not need to know this code. This repeats the sampling procedure we did above 10,000 times
+n<- 1000
+samples <- 10000
+out <- c()
+for (i in 1:samples){
+  out <- c(out,mean(sample(state,n,replace=FALSE)))
+}
+
+hist(out,breaks=100)
+mean(out)
+sd(out)
+```
+
+
+# Short Lecture: Sensitive Questions
+
+## List Experiment
+
+```{r}
+library(tidyverse)
+afghan <- read.csv("./class_data/afghan.csv") %>% filter(list.group!="ISAF")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/afghan.csv","afghan.csv")
+#afghan<- read.csv("afghan.csv") %>% filter(list.group!="ISAF")
+
+```
+
+Now let’s assess the list experiment. The relevant variables are:
+
+list.group      Whether respondents saw no sensitive items (Control), or a sensitive item stating that they support the Taliban
+list.response   Number of items on the list respondents agreed with
+
+1. What is the non-response rate to the list experiment? Note: you'll have to use is.na() for this. Review from class9.qmd if needed
+
+```{r}
+
+```
+
+2. What percentage of respondents supported the Taliban?
+
+```{r}
+
+
+```
+
+# Short Lecture: Prediction
+
+## 2008 Presidential Election
+
+Load the dataset:
+
+```{r}
+library(tidyverse)
+polls08 <- read.csv("./class_data/polls08.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/polls08.csv","polls08.csv")
+#polls08 <- read.csv("polls08.csv")
+
+```
+
+Let's create a new variable called _poll.margin_ that measures the difference in polling support between Obama and McCain:
+
+```{r}
+
+polls08 <- polls08 |> mutate(poll.margin=Obama-McCain)
+
+```
+
+Let’s examine polls within the state of California by filtering
+
+```{r}
+
+polls08 |> filter()
+
+```
+
+We can select the first observation using slice(1)
+
+```{r}
+
+
+```
+
+We can do this for all states at once by returning to the main dataset and using |> group_by _before_ slicing. 
+
+```{r}
+
+
+```
+
+## Merging datasets
+
+What if we want to compare the accuracy of our poll results to the actual results? To do that, we will need to merge two datasets together.
+
+Load the actual results: 
+
+```{r}
+pres08 <- read.csv("./class_data/pres08.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/pres08.csv","pres08.csv")
+#pres08 <- read.csv("pres08.csv")
+
+```
+
+Let's create a margin variable in this new dataset that mirrors our prior format (Obama vs Mccain)
+
+```{r}
+pres08 <- pres08 |> mutate(act.margin=Obama-McCain)
+
+```
+
+To merge datasets, we need to find a _key_ that's held in common between the two datasets.
+
+```{r}
+
+```
+
+We can merge using the following syntax:
+
+dataset1 |> left_join(dataset2,by="key")
+
+```{r}
+
+pres08 |> left_join()
+
+
+```
+
+This can result in some duplication of columns. To fix this, we can trim a dataset before merging using select():
+
+```{r}
+
+
+```
+
+## Error
+
+Evaluating Prediction error: Actual - Predicted
+
+```{r}
+# Create error variable
+master <- master |> mutate()
+
+```
+
+Root mean squared error (RMSE):
+
+sqrt(mean(error^2))
+
+```{r}
+
+```
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand (leave blank if nothing)?
+
