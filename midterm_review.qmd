@@ -1,0 +1,202 @@
+---
+title: "Midterm Review"
+format: docx
+execute:
+  error: TRUE
+---
+
+```{r setup, echo=F}
+library(knitr)
+opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE)
+knitr::opts_chunk$set(error = TRUE)
+```
+
+# Logistics
+
+# Different study types (whiteboard)
+
+# Conceptual Practice Questions
+
+1. Your friend Hildegard tells you that she has a designed a study to test the effects of watching NBC News on political preferences and obtained compelling results. Hildegard's study surveys the political preferences of 100 student volunteers. From this larger sample, she selected 20 strong Democrats and 20 strong Republicans, and tasks them with watching NBC News every night. At the end of the study, she measured political preferences again. According to Hildegard, watching NBC news makes the general population more Democratic: over time, both groups displayed more agreement with the Democratic party.
+
+Identify two errors with Hildegard's research design. If you wanted to rerun the study, how might you redesign it to obtain a more robust estimate of the effect of watching NBC news on political opinions?
+
+
+2. Your friend Bilbo designed an experiment to test whether exposure to videos showing squirrels raiding bird feeders reduces positive attitudes towards squirrels. 
+
+Bilbo randomly selected 20 Americans, and then randomly assigned 10 to watch the squirrel video. Conducting a balance check, Bilbo found that the treated and control group had approximately the same prior interest in squirrels. He concludes that the effect he identifies is causal. 
+
+Do you agree with his reasoning? 
+
+3. The difference-in-differences design is invalid if there are pre-existing differences between groups (TRUE/FALSE) 
+
+4. If the variable _Income_ has the following values: "Less than 20k", "Between 30k and 50k", "50k to 100k", and "100k+", can we treat it as an ordinal variable by recoding "Less than 20k" to 1, "Between 30k and 50k" to 2, "50k to 100k" to 3 etc?
+
+5. Two political organizations each run RCTs attempting to increase voter registration rates by administering a randomized intervention. You can't access the underlying data, but you know that Org A's ATE divided by the standard deviation is 0.57, and org B's was 0.27. Which intervention was more effective?
+
+6. A polling company sampled 200 Americans to ask them if they approved flouride in drinking water. On a scale of 1 to 5, where 1 meant "strongly oppose" and 5 meant "strongly support", the average response was 3.7. The standard deviation was 0.27. What was the expected error of this poll?
+
+
+
+# Treatment Effects with Multiple Groups
+
+### Scenario 1: You have a dataset with a single treatment variable, but multiple treatments
+
+```{r}
+savings <- read.csv("./class_data/rosca.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/rosca.csv","rosca.csv")
+#savings <- read.csv("rosca.csv")
+
+```
+
+Solution: Use group_by |> summarize() to get values for all groups
+
+```{r}
+
+savings |> filter(bg_female==1) |> group_by(tgroup) |> summarize(mean(fol2_amtinvest,na.rm=T))
+
+# To convert to binary measure
+savings <- savings |> mutate(locked_box=ifelse(tgroup=="Locked Box",1,0),
+                             safe_box=ifelse(tgroup=="Safe Box",1,0),
+                             encouragement=ifelse(tgroup=="Control",1,0))
+
+```
+
+Remember to subtract the control group from _each_ treated group
+
+
+### Scenario 2: You have a dataset with multiple binary treatment variables
+
+```{r}
+savings2 <- read.csv("./class_data/rosca2.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-s25/main/class_data/rosca2.csv","rosca2.csv")
+#savings2 <- read.csv("rosca2.csv")
+
+```
+
+Solution: Use filter() to get the correct groups
+
+```{r}
+
+savings2 |> filter(locked_box==1) |> summarize(mean(fol2_amtinvest,na.rm=T))
+
+savings2 |> filter(encouragement==1) |> summarize(mean(fol2_amtinvest,na.rm=T))
+
+```
+
+## Balance
+
+For RCTs and Natural Experiments, we need to verify that EVERY characteristic _measured before the treatment_, is on average, similar across the treated and control groups. Without this 'balance', we cannot interpret the results as causal. 
+
+Let's look at the GOTV study:
+
+
+```{r}
+gotv <- read.csv("./class_data/social2.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/social2.csv","social2.csv")
+#gotv <- read.csv("social2.csv")
+
+gotv |> group_by(messages) |> summarize(
+  mean(yearofbirth),
+  mean(primary2004),
+  mean(hhsize),
+  mean(sex)
+)
+
+# Note: if you have text variables and they are pre-treatment, need to convert those too
+```
+
+## Interpreting  Effect sizes
+
+```{r}
+# Boston experiment
+
+library(tidyverse)
+
+boston <- read.csv("problem_sets/data/boston.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/boston.csv","boston.csv")
+#boston <- read.csv("boston.csv")
+
+# ATE
+boston |> group_by(treatment) |> summarize(mean(immig_after,na.rm=T))
+
+```
+
+## Correlation tables
+
+```{r}
+savings |> select(-tgroup) |> cor(use="complete.obs")
+```
+
+# Difference in Differences
+
+Step 1: Identify if data is long or wide
+Step 2: Identify the time values on either side of the treatment
+Step 3: Estimate DiD using either long or wide code
+Step 4: Evaluate parallel trends using prior time periods
+
+
+## Regression Discontinuity
+
+Relevant variables:
+
+ln.gross        Log of wealth upon death (from probate records)
+yob             Year of birth
+yod             Year of death
+female          Whether candidate is female(1) or not (0)
+margin.pre      Average victory or loss margin in prior elections (a signal of candidate quality)
+margin          Victory or loss margin in the election being assessed; 
+                    this determines the discontinuity, and is the "running variable" we will use to narrow the analysis window
+party           political party
+
+```{r}
+library(tidyverse)
+
+british_mp <- read.csv("./class_data/MP.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/MP.csv","MP.csv")
+#british_mp <- read.csv("MP.csv")
+
+```
+
+Step 1: Identify the running variable
+Step 2: Create a treatment indicator based on the running variable
+
+```{r}
+british_mp$treatment <- ifelse(british_mp$margin > 0, 1, 0)
+```
+
+Step 3: Narrow the analysis window using the running variable
+
+```{r}
+british_mp <- british_mp |>
+filter(margin > -0.035 & margin < 0.035)
+```
+
+Step 4: Treat as a natural experiment: evaluate randomization
+
+```{r}
+# Note: could also create binary variables using ifelse() and then take the mean; this is a shortcut
+
+british_mp |> group_by(treatment) |>
+  summarize(mean(yob),
+            mean(female),
+            mean(school=="Eton"),
+            mean(school=="Regular"),
+            mean(school=="Public"))
+
+# Here there appears to be imbalance on schooling; would not evaluate subsequent results as causal
+
+```
+
+Step 5: Obtain ATE
+
+```{r}
+british_mp |>
+group_by(treatment) |>
+summarize(mean(ln.gross))
+12.59783 - 12.28
+```
