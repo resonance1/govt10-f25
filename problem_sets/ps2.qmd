@@ -1,0 +1,108 @@
+---
+title: "Problem Set 2"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Poll Averages and Election Predictions 
+
+We will evaluate data from the 2020 Presidential Election, which featured Trump vs. Biden. The election date was the 8th of November, 2016.
+
+```{r}
+library(tidyverse)
+
+polls20 <- read.csv("./data/polls20.csv") 
+pres20 <- read.csv("./data/pres20.csv")
+
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/polls20.csv","polls20.csv")
+#polls20 <- read.csv("polls20.csv")
+
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/pres20.csv","pres20.csv")
+#pres20 <- read.csv("pres20.csv")
+
+```
+
+1.1 In the polls20 dataset, create a variable which measures the polling margin, which we will define as (Biden-Trump).
+
+```{r}
+
+```
+
+1.2 Filter the polls20 dataset to only include those with a sample size greater than 500. 
+
+```{r}
+
+```
+
+1.3 Now, create a new version of the polls dataset that contains only polls conducted within 30 days of the last poll within each state. For instance, if the last poll in State A was conducted 3 days prior to the election, your dataset should include all polls conducted on days 33 through 3 for State A. If the last poll in State B was conducted 5 days prior to the election, your polls from this state should be drawn from days 5 through 35, etc.
+
+_Note: There are 2 ways of doing this. Here are some pointers to get you started down the right path_
+
+Option 1:
+Use  |> group_by |>  filter() , along with min() inside filter
+
+Option 2:
+a. Create a new dataset called _latestpoll_ that contains the most recent poll in each state, and use select() to extract just the state abbreviation and the _days_until_ value for the most recent poll.
+b. Use |> rename(lastpoll=days_until) on the results from #1 to rename _days_until_ into a new column called _lastpoll_
+c. Merge the results of #2 back into the polls20 dataset, and filter to contain only polls within x days of _lastpoll_
+
+
+```{r}
+
+```
+
+1.4 Start with your dataset containing all polls conducted within 30 days of the last poll, which you created in the previous question. Now, extract the average of the polls within each state, and save it as a new dataset called _avg_polls_ . Merge the _avg_polls_ and the _pres20_ dataset together into a new dataset called _merged.20_. 
+
+```{r}
+
+```
+
+1.5 Using the _merged.20_ dataset, assess the relationship between the actual voting margin (y) and the polling margin (x) using a bivariate regression model. Obtain and interpret the regression coefficients. What do they tell you about the relationship of the polls to the actual election results in 2020? 
+
+```{r}
+
+```
+
+*A few sentences here*
+
+1.6 Let's examine whether other variables can potentially improve our prediction and reduce polling bias. The following dataset contains state-level demographic data:
+
+```{r}
+demographics <- read.csv("./data/dem_agesex.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/dem_agesex.csv","dem_agesex.csv")
+#demographics <- read.csv("dem_agesex.csv")
+```
+
+Filter the demographics dataset to 2020 only. Then create a new variable in the dataset called _under45_ that contains the proportion of residents who are 45 years or younger (you'll have to add 2 columns to get this), as well as a variable called pctMale which contains the proportion of Male residents in each state. Next, merge this dataset with your existing _merged.20_ dataset using left_join(): 
+
+```{r}
+
+
+```
+
+_Note: the lecture on 10/28 will cover this material_
+
+1.7 Using the master dataset, fit two regressions: first, regress the actual voting margin in each state (y) on the `pctMale' variable (x), which should measure the share of residents who are Male (0 to 1 scale). Second, regress the actual voting margin in each state (y) on the _under45_ variable (x). Interpret the coefficients from each regression as well as the R^2.
+
+```{r}
+
+```
+
+*A few sentences here*
+
+1.8 Now fit a multivariate regression model using three independent variables: pctMale, under45, and the 30-day poll margin according to the most recent state poll(s). The syntax is  _lm(y~ x1 + x2 + x3)_ , where y is the outcome, and x1, x2, and x3 are the independent variables. Interpret the R^2 in words. Then compare the R^2 between the multivariate model and the bivariate model calculated in 1.7. Does adding this additional information improve the predictive power of the model? 
+
+```{r}
+
+
+```
+
+*2 sentences here*
+
+
+
+Please submit using Canvas
