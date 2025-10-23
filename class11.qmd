@@ -1,0 +1,276 @@
+---
+title: "Class 11"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Plan
+* Announcements
+* Review of Merging / Model Diagnostics
+* Group work
+* Intro to Bivariate Regression (Lecture)
+* Bivariate Regression in R 
+
+# Announcements
+
+- Midterm
+- Due dates
+- Survey: https://dartmouth.co1.qualtrics.com/jfe/form/SV_5BfiBDMEzDfYTA2
+
+# Merging and Prediction Error Review
+
+```{r}
+library(tidyverse)
+
+pres08 <- read.csv("./class_data/pres08.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/pres08.csv","pres08.csv")
+#pres08 <- read.csv("pres08.csv")
+
+polls08 <- read.csv("./class_data/polls08.csv") 
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/polls08.csv","polls08.csv")
+#polls08 <- read.csv("polls08.csv")
+
+pres08 <- pres08 |> mutate(act.margin= Obama - McCain) 
+polls08 <- polls08 |> mutate(poll.margin = Obama - McCain)
+
+```
+
+We can use |> arrange() to sort data. Let's use this to ensure the dataset is sorted by the most recent poll
+
+```{r}
+polls08 |> arrange()
+```
+
+Let's filter to the most recent poll in each state
+
+```{r}
+polls08 |>
+```
+
+Now let's save just the columns we need by adding a select():
+
+```{r}
+
+```
+
+Now let's merge the dataset from above to the actual election results, and save it as a new dataset
+
+```{r}
+merged <- pres08 |> left_join(recent,by="state")
+```
+
+Create a new variable that measures the error
+
+```{r}
+merged <- merged %>% mutate(error=act.margin-poll.margin)
+```
+
+Evaluate the quality of our predictions, using RMSE.
+
+```{r}
+sqrt(mean(merged$error^2))
+```
+
+# Group Work 1
+
+Modify the code above to average across all polls conducted _within the last two weeks_ before the election. Does the accuracy increase or decrease compared to looking at the most recent poll?
+  
+Coding Steps:
+1. Use filter() to subset the initial polls dataset to include only polls with days.until <= 14
+2. Use |> group_by()|> summarize(average14=xxxx) on the filtered dataset from #1, to obtain the _average_ poll margin in each state. Save the dataset with a new name.
+3. Merge this new dataset to the actual election results (pres08) using left_join(), and save it as a dataset called merged14
+4. Create a new variable in the merged14 dataset measuring the difference between the averaged polls and the actual results
+5. Compare the RMSE to the model we generated in class
+
+```{r}
+
+
+
+```
+
+# Lecture: Bivariate Regression
+
+## More practice interpreting bivariate regression coefficients
+
+1. Your friend Eleazar wants to model the relationship between each state's Republican vote share in the 2022 Congressional election, and support for Jo Jorgenson (the Libertarian candidate) in the 2020 Presidential election. He downloads data from the internet that is formatted as follows:
+
+Republican Vote Share '22 : Ranges from 0 to 100, where 100 is equivalent to 100% vote share
+Libertarian Vote Share '20 : Ranges from 0 to 1, where 1 is equivalent to 100% vote share
+
+He runs a regression on this data, and obtains the following coefficients: 
+
+(Republican Vote Share '22) = 48 + 12(Libertarian Vote Share '20) 
+
+Interpret the intercept and coefficient on (Libertarian Vote Share '20) in sentence form.
+
+*sentences here*
+
+2. Annoyed, you rescale Eleazar's data so that the dependent variable is also on a 0 to 1 scale. You fit the regression again, and the coefficients are:
+
+(Republican Vote Share '22) = .48 + .12(Libertarian Vote Share '20) 
+
+Interpret the coefficient on (Libertarian Vote Share '20) in sentence form.
+
+*sentence here*
+
+3. Upset that you modified, his dataset, Eleazar rescales the variables. But he accidentally rescales the independent variable instead of the dependent variable. You now have:
+
+Republican Vote Share '22 : Ranges from 0 to 1, where 1 is equivalent to 100% vote share
+Libertarian Vote Share '20 : Ranges from 0 to 100, where 1 is equivalent to 100% vote share
+
+(Republican Vote Share '22) = .48 + .0012(Libertarian Vote Share '20) 
+
+Interpret the coefficient on (Libertarian Vote Share '20) in sentence form.
+
+*sentence here*
+
+
+## Basic Regression in R 
+
+We are going to examine data on support for the Nazi party in Germany in 1933.
+
+```{r}
+library(tidyverse)
+fascism <- read.csv("./class_data/fascism.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/fascism.csv","fascism.csv")
+#fascism <- read_csv("fascism.csv")
+
+fascism$nazi_voteshare <- fascism$nazivote/fascism$nvoter
+fascism$unemployment_rate <- fascism$nunemployed/fascism$nvoter
+```
+
+Fitting regressions in R is straightforward: we use the function lm()
+
+```{r}
+y <- fascism$nazi_voteshare
+x <- fascism$unemployment_rate
+  
+result <- lm(y~x)
+result
+```
+
+To visualize, we can build a scatter plot, and superimpose the regression line on the data using abline():
+
+```{r}
+plot(x,y)
+abline(result,col="red")
+```
+
+Interpret the coefficients from the regression above in real-world terms. 
+
+For instance: "the intercept indicates that the expected level of Y if X is 0 is ?. The slope coefficient indicates that for every increase of ? in X, Y is expected to increase by ?. " (fill in ?,X,Y)
+
+*sentences here*
+
+
+# Group Work 2: Practice with bivariate regression in R
+
+Let's load the Afghan survey:
+
+```{r}
+afghan <- read.csv("./class_data/afghan.csv") %>% filter(list.group!="ISAF")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/afghan.csv","afghan.csv")
+#afghan<- read.csv("afghan.csv") %>% filter(list.group!="ISAF")
+```
+
+
+Afghan Variables:
+
+educ.years                        Respondents' years of education
+age                               Respondents' age in years
+employed                          If respondents are employed (1) or not (0)
+income                            Respondents' income range 
+
+1.  Code a new binary variable in the afghan dataset called _nonresponse_ that receives a 1 if income is missing, and 0 otherwise --- remember that the function for this is: is.na() . 
+
+```{r}
+
+afghan <- afghan |> mutate()
+
+```
+
+2. Then regress _educ.years_ (x) on _nonresponse_ (y) and interpret the coefficients.
+
+```{r}
+
+```
+
+3. Repeat for _age_ (x) on _nonresponse_ (y) and interpret the coefficients.
+
+```{r}
+
+```
+
+4. Now regress _employed_ (x) on _nonresponse_ (y), and interpret the results. Note that the interpretation for a binary x is similar to other variables: it is a 1 unit change (moving from 0 to 1). In this case, that means going from unemployed (0) to employed (1)
+
+```{r}
+
+```
+
+Now let's inspect more complicated relationships between two continuous variables.
+
+Load the arson dataset:
+
+```{r}
+arson <- read.csv("./class_data/arson.csv")
+
+#download.file("https://github.com/resonance1/govt10-f25/raw/refs/heads/main/class_data/arson.csv","arson.csv")
+#arson<- read.csv("arson.csv")
+
+```
+
+Relevant variables:
+
+attack_rate                Outcome. Total arson attacks on refugee housing, per 100k population
+region                     Region in Germany
+pop                        Population
+unemp                      Unemployment rate
+media                      Whether refugees received negative local media coverage, last 12 months (1 or 0)
+foreign                    Percentage of the population that is foreign-born
+foreign_change             Percentage point change in the foreign-born share over the last 10 years
+asylumseekers_2010         Asylum seekers per 1000 population, 2010
+asylumseekers_now          Asylum seekers per 1000 population, current data
+afd                        Support for the far-right AFD party, 2014
+protestant                 Share of the population that identifies as protestant
+catholic                   Share of the population that identifies as catholic
+male_female_ratio          Male/Female gender ratio
+pop_dens                   Population density
+east                       Whether the region is in East Germany (1) or not (0)
+npd                        Support for the neo-Nazi NPD party
+income_2014                Median income, 2014 (Euros)
+    
+Let's see if we can predict the intensity of arson attacks, based on characteristics of a region.
+
+5. First, find a variable of interest (x). Regress it on the arson rate (y). Plot the model, and interpret the coefficients in words.
+
+```{r}
+
+```
+
+6. Repeat for another variable (x). Based on the plots, which of the two variables appears to fit the data better? 
+
+```{r}
+
+```
+
+7. Finally, let's see if we can understand more about how polling data relates to actual results. Using the _merged_ dataset we created at the start of class, regress poll.margin (x) on act.margin (y). Interpret the coefficients. What does this tell us about polling bias in this particular election?
+
+```{r}
+
+```
+
+# Resources
+
+Files > Book Chapters > Data Analysis, Ch 4
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand (leave blank if nothing)?
+
