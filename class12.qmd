@@ -1,0 +1,254 @@
+---
+title: "Class 12"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Plan
+* Midterm review
+* Review: Bivariate coefficients
+* Model fit (quick lecture)
+* R2 in R
+* Multivariate Regression (longer lecture)
+* Interpreting multivariate regression coefficients
+* Practice with multivariate regression
+
+# Quick Review: Bivariate regression coefficients
+
+```{r}
+afghan <- read.csv("./class_data/afghan.csv") %>% filter(list.group!="ISAF")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/afghan.csv","afghan.csv")
+#afghan<- read.csv("afghan.csv") %>% filter(list.group!="ISAF")
+
+afghan <- afghan |> mutate(nonresponse=ifelse(is.na(income),1,0))
+
+```
+
+```{r}
+
+y <- afghan$nonresponse
+x <- afghan$employed
+  
+result <- lm(y~x)
+result
+
+```
+
+# Model fit (quick lecture)
+
+## R2 in R
+
+Load the arson dataset:
+
+```{r}
+arson <- read.csv("./class_data/arson.csv")
+
+#download.file("https://github.com/resonance1/govt10-f25/raw/refs/heads/main/class_data/arson.csv","arson.csv")
+#arson<- read.csv("arson.csv")
+
+```
+
+```{r}
+y <- arson$attack_rate
+x <- arson$unemp
+  
+result <- lm(y~x)
+result
+
+plot(x,y)
+abline(result,col="red")
+```
+
+# Multivariate Regression (lecture)
+
+## Interpretation Practice - Multivariate
+
+Your friend Cornelius wants to model how the density of wind farms influences support for environmental causes within a state. He also suspects that the wealthier the state, the higher the concern for environmental causes, regardless of wind farm density.
+
+The variables are defined as follows:
+
+- Support for Environmental Causes: Integer ranging from 0 to 100, where 100 is equivalent to full support
+- State Median Income: In thousand dollars (i.e. 47 = $47000)
+- Wind Farms: Per 100,000 Population (i.e. 3 = 3 wind farms per every 100k people)
+
+You obtain coefficients from a linear regression model:
+
+Support for Environmental Causes = 20 + 0.2(State Median Income) + 2.4(Wind Farms)
+
+Interpret the slope coefficients
+
+
+## Multivariate Regression in R
+
+Let's return to the Afghan survey non-response example, where we regressed employed on non-response to the income question. We're going to write the notation slightly differently:
+
+```{r}
+
+result <- lm(nonresponse ~ employed,data=)
+result
+
+```
+
+Now let's implement a multivariate regression and regress age and employed on non-response:
+
+```{r}
+
+result <- lm(nonresponse ~ employed,data=afghan)
+result
+
+```
+
+## Practice interpreting these coefficients:
+
+employed:
+
+age:
+
+
+## As a class
+
+Why does the coefficient for employed change in the multivariate regression? Let's look at the underlying correlations:
+
+```{r}
+
+afghan |> select() |> cor()
+
+```
+
+Now let's add a variable to the dataset that is uncorrelated with employed:
+
+```{r}
+# You do not need to know this code
+afghan$really_likes_skittles <- rbinom(nrow(afghan),size=1,prob=.001)
+
+```
+
+Let's add it to the regression. Does the coefficient change? 
+
+```{r}
+
+result <- lm(nonresponse ~ employed,data=afghan)
+result
+
+result <- lm(nonresponse ~ employed + really_likes_skittles,data=afghan)
+result
+
+```
+
+Only variables that are potential confounders (correlated with both the x and the y) will change the coefficients. The higher the correlation between x and the variable you add, the larger the change in the coefficients.
+
+# Slides: principles when fitting descriptive models
+
+## Practice fitting descriptive models in R
+
+Let's return to the arson dataset:
+
+Relevant variables:
+
+attack_rate                Outcome. Total arson attacks on refugee housing, per 100k population
+region                     Region in Germany
+pop                        Population
+unemp                      Unemployment rate
+media                      Whether refugees received negative local media coverage, last 12 months (1 or 0)
+foreign                    Percentage of the population that is foreign-born
+foreign_change             Percentage point change in the foreign-born share over the last 10 years
+asylumseekers_2010         Asylum seekers per 1000 population, 2010
+asylumseekers_now          Asylum seekers per 1000 population, current data
+afd                        Support for the far-right AFD party, 2014
+protestant                 Share of the population that identifies as protestant
+catholic                   Share of the population that identifies as catholic
+male_female_ratio          Male/Female gender ratio
+pop_dens                   Population density
+east                       Whether the region is in East Germany (1) or not (0)
+npd                        Support for the neo-Nazi NPD party
+income_2014                Median income, 2014 (Euros)
+    
+    
+```{r}
+
+# What role does local support for the NPD play in arson attacks?
+
+result <- lm(attack_rate ~ npd, data=arson)
+summary(result)
+
+# What about the unemployment rate?
+
+result <- lm(attack_rate ~ unemp, data=arson)
+summary(result)
+
+```
+
+# Group work
+
+Now try to understand the relationship between negative media coverage and attacks. First, examine the bivariate relationship. Then add up to 3 additional variables that may be possible confounders. Then interpret the R^2 and each of the regression coefficients in plain English.
+
+```{r}
+
+
+```
+
+*Sentences here*
+
+Next, we are going to descriptively examine the socio-demographic factors that lead people to support far-right parties. Specifically, we will examine a nationally representative survey conducted in France in 2021, which measured approval of the far-right National Rally party.
+
+Load the following data:
+
+```{r}
+
+```
+
+far_right              Scale indicating their level of approval for National Rally, ranging from 0 (none) to 100 (maximum) (outcome)
+married                Whether they are married (0) or not (1)
+age                    Age
+worried_corona         Ordinal scale indicating how worried they were about contracting coronavirus, ranging from 1 to 4
+rent                   Whether they rent (1) or own their home (0)
+inactive_worker        Whether they are currently inactive in the labor market (1) or not (0)
+female                 Whether they are female (1) or not (0)
+inc_low                Whether they have a low income (1) or not (0)
+foreign_born           Whether they were born in a different country (1) or not (0)
+edu_high               Whether they have a university education (1) or not (0)
+
+
+```{r}
+france <- read.csv("./class_data/france.csv")
+#download.file("https://github.com/resonance1/govt10-f25/raw/refs/heads/main/class_data/france.csv","france.csv")
+#france<- read.csv("france.csv")
+
+```
+
+Answer the following questions. Note that this is descriptive analysis: many of you will come up with different answers. That's ok. The important thing is to explore the data to understand the underlying relationships.
+
+1) What role did fear over the coronavirus play a role in increasing support for the National Rally? To answer this, we want to know whether coronavirus fear increased support for the National Rally, independent of other socioeconomic factors. First examine the bivariate relationship, and then add control variables to isolate the effect of coronavirus fear, holding other factors constant. Then interpret the coefficient on worried_corona in words.
+
+```{r}
+
+```
+
+*Answer here*
+
+2) What is the relationship between age and support for National Rally? First look at the bivariate relationship, as well as the R2. Then see whether the relationship changes as you add control variables (i.e things correlated with both age and support for the National Rally that are conceptually distinct from age). For instance, people of different ages may have different educational levels and incomes, etc. Does age still matter after adding these control variables? Interpret the coefficient on age in words.
+
+```{r}
+
+```
+
+*Answer here*
+
+3) Imagine we are hired by an opposing political party to understand who supports the National Rally, and have a limited budget. We can only collect 3 variables in addition to the outcome question. Which 3 variables should we choose? (hint: you want to maximize R2 while ensuring that the 3 variables are conceptually distinct).
+
+```{r}
+
+```
+
+*Answer here*
+
+If you have time remaining, you can work on finishing your problem set.
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand?
