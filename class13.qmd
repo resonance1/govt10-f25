@@ -1,0 +1,322 @@
+---
+title: "Class 13"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Plan
+* Announcements
+* Quick review: omitted variable bias
+* Descriptive models with multivariate regression
+* Prediction 
+* Intro to group project
+
+## Descriptive Models in R
+
+Let's return to the arson dataset:
+
+```{r}
+library(tidyverse)
+arson <- read.csv("./class_data/arson.csv")
+
+#download.file("https://github.com/resonance1/govt10-f25/raw/refs/heads/main/class_data/arson.csv","arson.csv")
+#arson<- read.csv("arson.csv")
+```
+
+
+Relevant variables:
+
+attack_rate                Outcome. Total arson attacks on refugee housing, per 100k population
+region                     Region in Germany
+pop                        Population
+unemp                      Unemployment rate
+media                      Whether refugees received negative local media coverage, last 12 months (1 or 0)
+foreign                    Percentage of the population that is foreign-born
+foreign_change             Percentage point change in the foreign-born share over the last 10 years
+asylumseekers_2010         Asylum seekers per 1000 population, 2010
+asylumseekers_now          Asylum seekers per 1000 population, current data
+afd                        Support for the far-right AFD party, 2014
+protestant                 Share of the population that identifies as protestant
+catholic                   Share of the population that identifies as catholic
+male_female_ratio          Male/Female gender ratio
+pop_dens                   Population density
+east                       Whether the region is in East Germany (1) or not (0)
+npd                        Support for the neo-Nazi NPD party
+income_2014                Median income, 2014 (Euros)
+    
+    
+```{r}
+
+# What role does local support for the NPD play in arson attacks?
+
+result <- lm(attack_rate ~ npd, data=arson)
+summary(result)
+
+# What about the unemployment rate?
+
+result <- lm(attack_rate ~ unemp, data=arson)
+summary(result)
+
+```
+
+# Group work
+
+Next, we are going to work with a new dataset. You will descriptively examine the factors that lead people to support far-right parties. Specifically, we will examine a nationally representative survey conducted in France in 2021 which measured support for the anti-immigrant National Rally party.
+
+Load the following data:
+
+```{r}
+
+france <- read.csv("./class_data/france2.csv")
+#download.file("https://github.com/resonance1/govt10-f25/raw/refs/heads/main/class_data/france2.csv","france2.csv")
+#france<- read.csv("france2.csv") 
+
+```
+
+For each respondent to the survey, the data indicates:
+
+rally                  Scale indicating their level of approval for National Rally, ranging from 0 (none) to 100 (maximum) (outcome)
+married                Whether they are married (0) or not (1)
+age                    Age
+attend_service         How often they attend religious services in a given month
+worried_corona         Ordinal scale indicating how worried they were about contracting coronavirus, ranging from 1 to 4
+perceived_diversity    The percentage of the residents of a respondent's town/city that they think are immigrants 
+female                 Whether they are female (1) or not (0)
+inc_high                Whether they have a high income (1) or not (0)
+foreign_born           Whether they were born in a different country (1) or not (0)
+edu_high               Whether they have a university education (1) or not (0)
+professional           Whether they have a white collar job (1) or not (0)
+imm_contact            How often they interact with immigrants in a normal month, renormalized on scale from 0 (never) to 1 (very often)
+
+Answer the following questions. Note that this is descriptive analysis: many of you will come up with different answers. That's ok. The important thing is to explore the data to understand the underlying relationships.
+
+1) What is the relationship between university education and support for National Rally? First look at the bivariate relationship, as well as the R2. Then see whether the relationship changes as you add control variables (i.e things correlated with both university education and support for the National Rally that are conceptually distinct from education). For instance, people of different ages may have different educational levels, etc. Does education still matter after adding these control variables? Interpret the coefficient on _edu_high_ in words.
+
+```{r}
+
+```
+
+*Answer here*
+
+2) What role does interacting w/ immigrants play? To answer this, we want to know how contact with immigrants affected support for the National Rally, independent of other factors. First examine the bivariate relationship, and then add control variables to isolate the effect, holding other factors constant. Then interpret the coefficient on _imm_contact_ in words.
+
+```{r}
+
+```
+
+*Answer here*
+
+3) Imagine we are hired by an opposing political party to understand who supports the National Rally, and have a limited budget. We can only collect 3 variables in addition to the outcome question. Which 3 variables should we choose? (ideally you want to maximize R2 while ensuring that the 3 variables are conceptually distinct).
+
+```{r}
+
+```
+
+*Answer here*
+
+
+## As a class
+
+```{r}
+france |> cor(use="complete.obs")
+
+# Machine learning (demonstration only, do not need to know code)
+install.packages(glmnet)
+library(glmnet)
+f2 <- france |> drop_na()
+X <- as.matrix(f2 |> select(-rally))
+y <- as.numeric(f2$rally)
+lasso_model <- cv.glmnet(X, y, alpha = 1) 
+coef(lasso_model)
+```
+
+
+# Prediction and Forecasting (brief lecture)
+
+# Prediction in R
+
+We can predict outcomes in R using predict(). Let's predict support for Nationally Rally for someone who is 40 years old, has a high education, and is not married.
+
+```{r}
+result <- lm(rally~ age + edu_high + married,data=france)
+summary(result)
+#new <- data.frame(oldvariablename = newdata)
+#predict(result, newdata=new)
+  
+```
+
+# Group assignment
+
+# Your first election prediction model (a template)
+
+Let's create a predictive model with the latest poll from 2008 and the percent of Black voters, and use it to predict outcomes in 2020. We'll cross-validate the model on 2016
+
+To do this, we need the following:
+
+*Training Dataset:*
+Actual Margin in 2008 (y)
+Poll Margin in 2008 (x)
+% Black in 2008 (x)
+
+*Cross-validation dataset*
+Actual Margin in 2016 (y)
+Poll Margin in 2016 (x)
+% Black in 2016 (x)
+
+*Test Dataset:*
+Poll Margin in 2020 (x)
+% Black in 2020 (x)
+
+```{r}
+# All margins defined as Democrat - Republican
+
+library(tidyverse)
+
+polls08 <- read.csv("./problem_sets/data/polls08.csv")
+polls16 <- read.csv("./problem_sets/data/polls16.csv")
+polls20 <- read.csv("./problem_sets/data/polls20.csv")
+pres08 <- read.csv("./problem_sets/data/pres08.csv")
+pres16 <- read.csv("./problem_sets/data/pres16.csv")
+demographics <- read.csv("./problem_sets/data/dem_race.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/polls08.csv","polls08.csv")
+#polls08 <- read.csv("polls08.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/polls16.csv","polls16.csv")
+#polls16 <- read.csv("polls16.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/polls20.csv","polls20.csv")
+#polls20 <- read.csv("polls20.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/pres08.csv","pres08.csv")
+#pres08 <- read.csv("pres08.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/pres16.csv","pres16.csv")
+#pres16 <- read.csv("pres16.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/dem_race.csv","demographics_full.csv")
+#demographics <- read.csv("demographics_full.csv")
+
+pres08$actual.margin <- pres08$Obama - pres08$McCain
+polls08$days.until <- as.Date("2008-11-04") - as.Date(polls08$middate, "%m/%d/%y")
+polls08$margin <- polls08$Obama - polls08$McCain
+polls16$margin <- polls16$clinton - polls16$trump
+polls16$days.until <- as.Date("2016-11-08") - as.Date(polls16$date, "%m/%d/%y")
+pres16$actual.margin <- pres16$clinton - pres16$trump
+polls20$margin <- polls20$biden - polls20$trump
+
+```
+
+```{r}
+
+### CREATE THE TRAINING DATASET AND FIT THE MODEL
+
+# Get most recent poll in 2008, by state
+polls08_latest <- polls08 |> group_by(state)  |> 
+  arrange(days.until)  |>  slice(1)  |> 
+  select(margin,state)
+
+# Find the % black in 2008, by state
+
+demographics08 <- demographics |> filter() |>
+  mutate(pctBlack=) |>
+  select(pctBlack,state)
+
+# Merge the two independent variables together
+
+training <- polls08_latest  |> left_join()
+  
+# Merge in the outcomes for 2008
+
+training <- training |>  left_join()
+  
+# Fit the model
+result <- lm()
+summary(result)
+
+```
+
+
+```{r}
+
+### CROSS-VALIDATE ON 2016 (i.e. predict and diagnose how good the out of sample prediction was)
+
+# Get most recent poll in 2016, by state
+polls16_latest <- polls16 |> group_by(state) |>  
+  arrange(days.until) |>  slice(1) |> 
+  select(state,margin)
+
+# Find the % black in 2016, by state
+demographics_16 <- demographics  |> filter(Year==2016) |>
+  mutate(pctBlack=Black.Alone/Total.Population) |>
+  select(pctBlack,state)
+
+# Merge the two together
+xvalidate <- polls16_latest |> left_join(demographics_16,by="state")
+result
+
+#Next, we predict, telling R how to map the variable names
+
+predict_frame <- data.frame()
+predictions <- predict(result,newdata=predict_frame)
+xv.out.df <- data.frame(state=xvalidate$state,predict=predictions)
+xv.out.df
+
+
+### Diagnose
+
+# Merge in actual outcomes from 2016
+
+xv.out.df <- xv.out.df |> left_join(pres16,by="state")
+
+# Calculate error (actual - predicted)
+
+xv.out.df$error <- 
+
+# RMSE
+sqrt(mean(xv.out.df$error^2))
+
+# Plot
+
+x<- 
+y<- 
+  
+plot(type="n",x =  x , y = y, xlab = "Predicted Results", ylab = "Actual Election Results")
+text(x = x  , y = y, 
+     labels = xv.out.df$state, 
+     col = "blue",
+     cex=.5)
+
+# Diagnosis Lines
+abline(0, 1, lty = "dashed")
+abline(v=0)
+abline(h=0)
+
+```
+
+
+```{r}
+
+### CREATE THE TEST DATASET AND PREDICT ON 2020
+
+# Get most recent poll in 2020, by state
+
+# Find the % black , by state
+
+# Merge the two together
+
+# Create a test dataframe
+predict_frame <- data.frame()
+
+
+# Predict
+out <- predict(result,newdata=predict_frame)
+
+out.df <- data.frame(state=test$state,predict=out)
+out.df
+
+
+```
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand?
