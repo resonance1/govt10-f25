@@ -1,0 +1,162 @@
+---
+title: "Prediction Template"
+format: docx
+execute:
+  error: TRUE
+---
+
+Note: You can copy this code to your ps_group.qmd, which contains links to additional datasets.
+
+```{r}
+# All margins defined as Democrat - Republican
+
+library(tidyverse)
+
+polls08 <- read.csv("./problem_sets/data/polls08.csv")
+polls16 <- read.csv("./problem_sets/data/polls16.csv")
+polls20 <- read.csv("./problem_sets/data/polls20.csv")
+pres08 <- read.csv("./problem_sets/data/pres08.csv")
+pres16 <- read.csv("./problem_sets/data/pres16.csv")
+demographics <- read.csv("./problem_sets/data/dem_race.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/polls08.csv","polls08.csv")
+#polls08 <- read.csv("polls08.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/polls16.csv","polls16.csv")
+#polls16 <- read.csv("polls16.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/polls20.csv","polls20.csv")
+#polls20 <- read.csv("polls20.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/pres08.csv","pres08.csv")
+#pres08 <- read.csv("pres08.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/pres16.csv","pres16.csv")
+#pres16 <- read.csv("pres16.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/dem_race.csv","demographics_full.csv")
+#demographics <- read.csv("demographics_full.csv")
+
+pres08$actual.margin <- pres08$Obama - pres08$McCain
+polls08$days.until <- as.Date("2008-11-04") - as.Date(polls08$middate, "%m/%d/%y")
+polls08$margin <- polls08$Obama - polls08$McCain
+polls16$margin <- polls16$clinton - polls16$trump
+polls16$days.until <- as.Date("2016-11-08") - as.Date(polls16$date, "%m/%d/%y")
+pres16$actual.margin <- pres16$clinton - pres16$trump
+polls20$margin <- polls20$biden - polls20$trump
+
+```
+
+Initial Models
+
+```{r}
+
+### CREATE THE TRAINING DATASET AND FIT THE MODEL
+
+# Get most recent poll in 2008, by state
+polls08_latest <- polls08 |> group_by(state)  |> 
+  arrange(days.until)  |>  slice(1)  |> 
+  select(margin,state)
+
+# Find the % black in 2008, by state
+
+demographics08 <- demographics |> filter(Year==2008) |>
+  mutate(pctBlack=Black.Alone/Total.Population) |>
+  select(pctBlack,state)
+
+# Merge the two independent variables together
+
+training <- polls08_latest  |> left_join(demographics08,by="state")
+  
+# Merge in the outcomes for 2008
+
+training <- training |>  left_join(pres08,by="state")
+  
+# Fit the model
+result <- lm(actual.margin~margin + pctBlack,data=training)
+summary(result)
+
+```
+
+
+Cross-validation
+```{r}
+
+### CROSS-VALIDATE ON 2016 (i.e. predict and diagnose how good the out of sample prediction was)
+
+# Get most recent poll in 2016, by state
+polls16_latest <- polls16 |> group_by(state) |>  
+  arrange(days.until) |>  slice(1) |> 
+  select(state,margin)
+
+# Find the % black in 2016, by state
+demographics_16 <- demographics  |> filter(Year==2016) |>
+  mutate(pctBlack=Black.Alone/Total.Population) |>
+  select(pctBlack,state)
+
+# Merge the two together
+xvalidate <- polls16_latest |> left_join(demographics_16,by="state")
+
+#Next, we predict, telling R how to map the variable names
+
+predict_frame <- data.frame(xvalidate)
+predictions <- predict(result,newdata=predict_frame)
+xv.out.df <- data.frame(state=xvalidate$state,predict=predictions)
+
+### Diagnose
+
+# Merge in actual outcomes from 2016
+
+xv.out.df <- xv.out.df |> left_join(pres16,by="state")
+
+# Calculate error (actual - predicted)
+
+xv.out.df$error <- xv.out.df$actual.margin - xv.out.df$predict
+
+# RMSE
+sqrt(mean(xv.out.df$error^2))
+
+# Plot
+
+x<- xv.out.df$predict
+y<- xv.out.df$actual.margin
+  
+plot(type="n",x =  x , y = y, xlab = "Predicted Results", ylab = "Actual Election Results")
+text(x = x  , y = y, 
+     labels = xv.out.df$state, 
+     col = "blue",
+     cex=.5)
+
+# Diagnosis Lines
+abline(0, 1, lty = "dashed")
+abline(v=0)
+abline(h=0)
+
+```
+
+This should be adapted to predict to 2024, after polls for 2024 become available
+
+```{r}
+
+### CREATE THE TEST DATASET AND PREDICT ON 2020
+
+# Get most recent poll in 2016, by state
+polls20_latest <- polls20 |> group_by(state) |>  
+  arrange(days.until) |>  slice(1) |> 
+  select(state,margin)
+
+# Find the % black in 2020, by state
+demographics_20 <- demographics  |> filter(Year==2020) |>
+  mutate(pctBlack=Black.Alone/Total.Population) |>
+  select(pctBlack,state)
+
+# Merge the two together
+test <- polls20_latest |> left_join(demographics_20,by="state")
+
+# Create a test dataframe
+predict_frame <- data.frame(test)
+
+# Predict
+out <- predict(result,newdata=predict_frame)
+
+out.df <- data.frame(state=test$state,predict=out)
+out.df
+
+
+```
+
