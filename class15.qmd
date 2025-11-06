@@ -1,0 +1,194 @@
+---
+title: "Class 15"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Plan
+* Questions on group psets
+* Uncertainty (Lecture)
+* Standard error
+* Group work: standard error for a difference in means
+* Central Limit Theorem
+
+# Uncertainty (lecture)
+
+# Recap: how standard error works
+
+Let's use the normal distribution to calculate the standard error of a poll of size 500.
+
+First, let's simulate doing this manually:
+
+```{r}
+
+# You do not need to understand this code
+
+population <- c(rep(1,50000),rep(0,50000))
+
+# Simulation - Get sampling distribution
+n <- 10000  # number of polls
+ss <- 1000  # sample size
+results <- rep(NA,n)
+for (i in 1:n){
+  poll <- sample(population,ss,replace=F)
+  results[i] <- mean(poll)
+}
+
+# Sampling distribution
+hist(results,breaks=50)
+
+# Standard deviation of sampling distribution
+round(sd(results),2)
+```
+
+Now let's use the formula (with only 1 poll)
+
+```{r}
+poll <- sample(population,ss,replace=F)
+p_sd <- sd(poll)
+se <- p_sd / sqrt(ss)
+round(se, 2)
+```
+
+
+# Standard Error Beyond Polls
+
+```{r}
+library(tidyverse)
+resume <- read.csv("./class_data/resume.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/resume.csv","resume.csv")
+#resume <- read.csv("resume.csv")
+
+```
+
+Let's calculate the average callback rate in the data:
+
+```{r}
+
+```
+
+Now we calculate the standard error:
+
+```{r}
+
+```
+
+What's going on under the hood?
+
+```{r}
+
+# Simulation - Get sampling distribution
+n <- 5000  # number of samples
+results_resume <- rep(NA,n)
+for (i in 1:n){
+  resume_n <- resume %>% sample_n(4870, replace = TRUE)
+  results_resume[i] <- mean(resume_n$call)
+}
+
+# Sampling distribution
+hist(results_resume)
+
+# Standard deviation of sampling distribution
+sd(results_resume)
+
+# Formula
+sd(resume$call)/sqrt(nrow(resume))
+
+```
+
+One thing to keep in mind is that as we narrow the sample, the standard error will change (because the n and the sd change):
+
+Let's get the standard error for the callback rate for white resumes.
+
+```{r}
+resume |> filter(race=="white") |> summarize()
+```
+
+
+# Group Work: Standard error for a difference in means
+
+Let's work with the Chechen artillery fire natural experiment. First, obtain the difference in means between the treated and control group for the _postattack_ variable.
+
+Treated group: (fire: 1)
+Control group: (fire: 0)
+
+```{r}
+library(tidyverse)
+chechen <- read.csv("./class_data/chechen.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/chechen.csv","chechen.csv")
+#chechen <- read.csv("chechen.csv")
+
+# Reminder: we can use group_by |> summarize() for this
+
+```
+
+Estimate the standard error for this difference in means, by obtaining the standard deviation and sample size of _each_ distribution. Remember that you can use table() to count observations; you can also use n() inside summarize() after doing a group_by(). To obtain the standard deviations for each group, use sd(outcome) on a filtered dataset, or use sd(outcome) within summarize()
+
+```{r}
+
+
+# Sample Size
+n_treatment <- 
+n_control <-  
+  
+# Standard deviation
+sd_treatment <-
+sd_control <-  
+
+# Combine using formula
+sqrt(((sd_treatment^2)/n_treatment) + ((sd_control^2)/ n_control) )
+  
+# Answer should match: 0.4165658
+```
+
+# Central Limit Theorem (lecture)
+
+# Central Limit Theorem Demonstration
+
+Plot the state population from earlier:
+
+```{r}
+hist(population)
+```
+
+Plot the means of the polls from earlier (the sampling distribution)
+
+```{r}
+# You do not need to know this code
+
+hist(results,xlim=c(.4,.6),col="lightgray",breaks=(n/2))
+abline(v=mean(results),col="blue",lwd=3)
+abline(v=.5,col="red",lwd=3)
+
+```
+
+We have n values: how many are outside the boundaries? 
+
+If it's a perfectly normal distribution, it should be ~2.5% on each side.
+
+```{r}
+# You do not need to know this code
+
+length(results[results < mean(results) - 1.96*sd(results)])  / n
+length(results[results > mean(results) + 1.96*sd(results)])  / n
+```
+
+
+# Confidence Interval (only if time)
+
+Let's make a 90% confidence interval for our Chechnya estimate:
+
+```{r}
+
+```
+
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand?
