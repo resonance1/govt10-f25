@@ -162,7 +162,7 @@ Interpret the 90% confidence interval using appropriate language.
 library(tidyverse)
 chechen <- read.csv("./class_data/chechen.csv")
 
-#download.file("https://raw.githubusercontent.com/resonance1/govt10-s25/refs/heads/main/class_data/chechen.csv","chechen.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/class_data/chechen.csv","chechen.csv")
 #chechen <- read.csv("chechen.csv")
 
 ```
@@ -190,7 +190,7 @@ Let's re-evaluate the study on racial bias in hiring.
 ```{r}
 resume <- read.csv("./class_data/resume.csv")
 
-#download.file("https://raw.githubusercontent.com/resonance1/govt10-s25/main/class_data/resume.csv","resume.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/resume.csv","resume.csv")
 #resume <- read.csv("resume.csv")
 ```
 
