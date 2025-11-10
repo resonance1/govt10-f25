@@ -1,0 +1,284 @@
+---
+title: "Class 16"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Plan
+* Quiz review
+* Central limit theorem (and confidence intervals (lecture)
+* Central limit theorem demonstration
+* Confidence intervals (lecture)
+* Short Group work
+* Regression and standard error
+* Group work
+
+# Central Limit Theorem (lecture)
+
+# Central Limit Theorem Demonstration
+
+The actual support for Trump in this particular state is 50%:
+
+```{r}
+library(tidyverse)
+
+# You do not need to understand this code
+
+population <- c(rep(1,50000),rep(0,50000))
+
+# Simulation - Get sampling distribution
+n <- 10000  # number of polls
+ss <- 1000  # sample size
+results <- rep(NA,n)
+for (i in 1:n){
+  poll <- sample(population,ss,replace=F)
+  results[i] <- mean(poll)
+}
+
+```
+
+Let's plot the support for Trump in the population
+
+```{r}
+hist(population)
+```
+
+Plot the means of the polls (the sampling distribution)
+
+```{r}
+# You do not need to know this code
+
+hist(results,xlim=c(.4,.6),col="lightgray",breaks=(n/2))
+abline(v=mean(results),col="blue",lwd=3)
+abline(v=.5,col="red",lwd=3)
+
+```
+
+We have n values: how many are outside the boundaries? 
+
+If it's a perfectly normal distribution, it should be ~2.5% on each side.
+
+```{r}
+# You do not need to know this code
+
+length(results[results < mean(results) - 1.96*sd(results)])  / n
+length(results[results > mean(results) + 1.96*sd(results)])  / n
+```
+
+
+# Confidence Interval 
+
+Let's sample a single poll from our state population:
+
+```{r}
+# Take a single sample of size 1000
+ss <- 1000
+poll <- sample(state,ss,replace=F)
+
+# Calculate the mean and standard error
+p_mean <- mean(poll)
+p_se <- sd(poll)/sqrt(ss)
+
+p_mean
+p_se
+```
+
+Since this is a random sample, let's take the information about the standard error to make an inference about how repeated measurements of the same population could vary (how far off could we be, still drawing from the 'correct population)?
+
+Let's asssume a normal distribution, and use the 95% critical values
+
+```{r}
+
+```
+
+Is the 'true value' in this confidence interval? (With our choice of critical values, roughly 5% of you will have a confidence interval that does not contain the true value)
+
+Instead of memorizing 1.96, can use the _qnorm()_ function to get exact critical values from the normal distribution.
+
+We pass qnorm() a percentile value, that is equivalent to the cutoff for the confidence interval.
+
+```{r}
+# For a 95% confidence interval, 2.5% of the distribution is left on each side
+
+qnorm(.025)
+qnorm(.975)
+
+# Formula
+(1-xx)/2
+
+```
+
+
+Let's visualize what these different confidence intervals are doing:
+
+```{r}
+# Normal distribution (don't need to know this code)
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+plot(x,hx,lty=1,type="l")
+
+# 90% confidence interval
+abline(v=qnorm((1-.9)/2),col="burlywood")
+abline(v=-1*qnorm((1-.9)/2),col="burlywood")
+
+# 95% confidence interval
+
+abline(v=qnorm((1-.95)/2),col="thistle")
+abline(v=-1*qnorm((1-.95)/2),col="thistle")
+
+# 99% confidence interval
+
+abline(v=qnorm((1-.99)/2),col="darkgoldenrod")
+abline(v=-1*qnorm((1-.99)/2),col="darkgoldenrod")
+
+# 60% confidence interval
+
+abline(v=qnorm((1-.6)/2),col="dodgerblue")
+abline(v=-1*qnorm((1-.6)/2),col="dodgerblue")
+
+```
+
+
+# Group work: Confidence intervals  
+
+Let's build on the previous group work, and construct confidence intervals for our Chechnya estimates.
+
+Obtain 90%, 95%, and 99% confidence intervals for the Chechen difference in means you calculated in the last class. You'll need the difference in means and the standard error, which are provided below. To practice, use _qnorm()_ to obtain the exact critical values.
+
+```{r}
+se <- 0.4165658
+diff_mean <- -0.553459
+
+```
+
+Interpret the 90% confidence interval using appropriate language. 
+
+*Answer here*
+
+# Using regression for standard error / confidence interval
+
+```{r}
+library(tidyverse)
+chechen <- read.csv("./class_data/chechen.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-s25/refs/heads/main/class_data/chechen.csv","chechen.csv")
+#chechen <- read.csv("chechen.csv")
+
+```
+
+For a _binary treatment indicator_, standard errors for treatment effects can be quickly calculated using linear regression. Let's regress fire (x) on postattack (y)
+
+```{r}
+
+result <- lm(,data=chechen)
+summary(result)
+
+```
+
+We can use _confint(,level=)_ to quickly calculate confidence intervals for regression coefficients.
+
+```{r}
+confint(result,level=)
+```
+
+
+# Group Work: Confidence Intervals
+
+Let's re-evaluate the study on racial bias in hiring. 
+
+```{r}
+resume <- read.csv("./class_data/resume.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-s25/main/class_data/resume.csv","resume.csv")
+#resume <- read.csv("resume.csv")
+```
+
+In this experiment, identical resumes were sent out, except for the signaled race and gender, which was randomly assigned. We are interested in whether a resume received a call back from an employer or not.
+
+Variables:
+race    Signaled race on resume
+sex     Signaled gender on resume
+call    A binary variable indicating a call back (1) or not (0) 
+
+1.1 First, calculate the average treatment effect:
+
+Avg (Callback for White Resumes) - Avg (Callback for Black Resumes) 
+
+```{r}
+
+```
+
+1.2 Now calculate the standard error for this difference in means. You can either use this formula:
+sqrt( (sd_treatment^2 / n_treatment) + (sd_control^2 / n_control)), or a regression.
+
+```{r}
+# Manual approach
+n_treatment <- 
+n_control <- 
+sd_treatment <- 
+sd_control <- 
+  
+se <- sqrt( (sd_treatment^2 / n_treatment) + (sd_control^2 / n_control))
+se
+
+```
+
+1.3 Calculate a 90% confidence interval for the difference in means. 
+
+```{r}
+
+```
+
+1.4 Can we conclude based on 1.3 that there is likely racial bias in hiring, with 90% confidence?
+
+
+
+1.5: Would this change with a 99% confidence interval (critical value = 2.58)?
+
+```{r}
+
+
+```
+
+1.6 Conceptual question:
+
+The 90% confidence interval for the average of Group A is -0.04 to 0.07
+The 90% confidence interval for the average of Group B is -0.03 to 0.17
+
+Can we conclude that B > A?
+
+
+# (Only if time): Lecture: t-distribution
+
+Compare t to normal (don't need to know this code)
+```{r}
+# Do not need to know this code
+n <- samplesize <- 4
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+plot(x,hx,lty=1,type="l",col="blue")
+lines(x, dt(x,n-1), lwd=2, col="red")
+```
+
+For smaller sample sizes, we can use _qt()_ to obtain critical values and confidence intervals. This is the equivalent of _qnorm_ for the t-distribution. qt() requires us to state the degrees of freedom.
+
+Let's obtain critical values for a 95% confidence interval, with a sample size of 10
+
+```{r}
+
+```
+
+We can use qt() all the time to be conservative, but if the sample size is large it will be similar to qnorm(). Let's use qt() for the resume example, constructing a 90% confidence interval
+
+```{r}
+
+```
+
+
+
+## Check-in
+
+1. On a scale ranging between 1 (Too Hard) and 10 (Too Easy), how was today's class: 
+2. What was the easiest thing to understand?
+3. What was the most difficult thing to understand?
