@@ -14,7 +14,13 @@ execute:
 * Regression and standard error
 * Group work
 
+```{r}
+weighted.mean(c(100,85),c(.04,.07))
+```
+
 # Central Limit Theorem (lecture)
+
+https://www.youtube.com/watch?v=4HpvBZnHOVI
 
 # Central Limit Theorem Demonstration
 
@@ -109,7 +115,6 @@ qnorm(.975)
 
 ```
 
-
 Let's visualize what these different confidence intervals are doing:
 
 ```{r}
@@ -144,11 +149,12 @@ abline(v=-1*qnorm((1-.6)/2),col="dodgerblue")
 
 Let's build on the previous group work, and construct confidence intervals for our Chechnya estimates.
 
-Obtain 90%, 95%, and 99% confidence intervals for the Chechen difference in means you calculated in the last class. You'll need the difference in means and the standard error, which are provided below. To practice, use _qnorm()_ to obtain the exact critical values.
+Obtain 90%, 95%, and 99% confidence intervals for the Chechen estimate you calculated in the last class. You'll need the difference in means and the standard error, which are provided below. To practice, use _qnorm()_ to obtain the exact critical values.
 
 ```{r}
-se <- 0.4165658
-diff_mean <- -0.553459
+
+diff_mean <- -0.553459 # difference in attacks after random artillery fire
+se <- 0.4165658 # se for the difference in means
 
 ```
 
@@ -156,7 +162,7 @@ Interpret the 90% confidence interval using appropriate language.
 
 *Answer here*
 
-# Using regression for standard error / confidence interval
+# As a class: Using regression for standard error / confidence interval
 
 ```{r}
 library(tidyverse)
@@ -241,7 +247,7 @@ se
 
 ```
 
-1.6 Conceptual question:
+1.6 Conceptual question on confidence intervals:
 
 The 90% confidence interval for the average of Group A is -0.04 to 0.07
 The 90% confidence interval for the average of Group B is -0.03 to 0.17
@@ -266,10 +272,10 @@ For smaller sample sizes, we can use _qt()_ to obtain critical values and confid
 Let's obtain critical values for a 95% confidence interval, with a sample size of 10
 
 ```{r}
-
+#qt(,df=)
 ```
 
-We can use qt() all the time to be conservative, but if the sample size is large it will be similar to qnorm(). Let's use qt() for the resume example, constructing a 90% confidence interval
+We can use qt() all the time to be conservative, but if the sample size is large the critical value will be similar to qnorm(). Let's use qt() for the resume example, constructing a 90% confidence interval
 
 ```{r}
 
