@@ -1,0 +1,135 @@
+---
+title: "Problem Set 3"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Part 1: Ethnicity and Voting in African Countries
+
+To explore whether a presidential candidate can utilize their wife's ethnicity to garner coethnic support (where a voter prefers to vote for a candidate of his/her own ethnic group; a well-established phenomenon in many African democracies), a group of researchers used historic data from the Afrobarometer (a public attitude survey on democracy and governance in more than 35 countries in Africa). For the purposes of this exercise, only African democracies where the president and their partner are not of the same ethnicity are considered (i.e., the president and his wife are not coethnic with one another).
+
+country         Character variable indicating which country the respondent is from
+wifecoethnic    1 if respondent is same ethnicity as president's wife, and 0 otherwise
+oppcoethnic     1 if respondent is same ethnicity as main presidential opponent, and 0 otherwise
+ethnicpercent   Respondent's ethnic group fraction in respondent country.
+vote            1 if respondent would vote for the president, 0 otherwise.
+
+```{r}
+afb <- read.csv("./data/afb.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/afb.csv","afb.csv")
+#afb <- read.csv("afb.csv")
+
+```
+
+1.1 Evaluate the null hypothesis that respondents who are coethnic with the president's wife are not more likely to vote for the president, at the 95% confidence level. You may use either t-statistics or a confidence interval, but describe why you reject/fail to reject the null hypothesis. 
+
+```{r}
+
+
+```
+
+[Sentences here]
+
+1.2 Since this is not a randomized experiment, we might be concerned that we have not taken into account potentially confounding factors such as whether the respondent is part of a proportionally larger or smaller ethnic group. If a respondent's ethnic group is quite small, the members might be less able to put forth a candidate of their exact ethnic label and have more incentive to support a president who, while not the same ethnicity, has a wife who does (and who therefore might have the wife's ethnic group interests at heart). 
+
+Investigate this possibility by creating a new binary variable in the dataset, _ethnicpercent_binary_,  which is equal to 1 if the respondent's ethnic group fraction is greater than the median level in the dataset and is equal to 0 otherwise. 
+
+```{r}
+
+```
+
+1.3 Using the variable from 1.2, create a new subset of the data called _afbsmall_ which only includes members from small ethnic groups (below the median size in the dataset).
+
+```{r}
+
+```
+
+1.4  Re-evaluate the null hypothesis using respondents from small ethnic groups only (_afbsmall_).  Do the conclusions from 1.1 change? 
+
+```{r}
+
+```
+
+[Sentences here]
+
+1.5 Another concern we might have is that respondents might have the same ethnicity as an opponent. Regress both _wifecoethnic_  and  _oppcoethnic_ on _vote_ (y). Interpret the coefficients and t-statistics associated with the _wifecoethnic_ and _oppcoethnic_ variables. Is the ethnicity of the opponent a major confounder? 
+
+```{r}
+
+```
+
+[Sentences here]
+
+
+# Attitudes towards refugees
+
+One week after President Donald Trump signed an executive order to limit the flow of refugees to the United States, researchers fielded a nationally representative survey to understand American citizens’ attitudes toward refugee resettlement. 
+
+One of the goals the study was to assess the prevalence of NIMBYism (Not in my backyard syndrome) -- in this case, the idea that individuals support refugee resettlement in the abstract, but only as long as it does not impact their own lives or local community. To determine NIMBYism, the researchers asked respondents whether they supported (a) increasing the number of refugees the United States accepts each year, or (b) increasing the number of refugees their state or local community accepts each year, in random order. 
+
+
+```{r}
+nimby <- read.csv("./data/nimby.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/nimby.csv","nimby.csv")
+#nimby <- read.csv("nimby.csv")
+
+```
+
+Variables:
+
+L:                     Support for refugee resettlement in respondent's local community, on a 0 to 10 scale, where 10 indicates highest support
+US:                    Support for refugee resettlement in the United States, on a 0 to 10 scale, where 10 indicates highest support
+rep:                   Whether the respondent identifies as a Republican (1) or not (0)
+dem:                   Whether the respondent identifies as a Democrat (1) or not (0)
+female:                Whether the respondent is female (1) or not (0)
+employed:              Whether the respondent is employed (1) or not (0)
+nonhispanic_white:     Whether the respondent is non-hispanic white (1) or not (0)
+bachelors:             Whether the respondent has a bachelors degree (1) or not (0)
+above_median_income:   Whether the respondent's income is above the median level (1) or not (0)
+
+
+2.1. Evaluate the average support for refugee resettlement in the US among Republicans and Democrats. Interpret the results. Then use a t-test or regression to determine whether the two means differ statistically at the 99% level.
+
+```{r}
+
+```
+
+2.2. Calculate the support for refugee resettlement in the US among independents (those who do not identify with either party). You will likely need to create a new variable to assess this.
+
+```{r}
+
+```
+
+2.3. Now we will begin to evaluate NIMBYism. Using the full sample, calculate the average support for refugee resettlement in the United States (US) vs. support for refugee resettlement in respondent's local communities (L). Which value is higher? Do the two means differ statistically, at the 90% level? 
+
+```{r}
+
+```
+
+
+2.4. Now we will examine whether NIMBYism varies according to sociodemographic factors. First, create a new dependent variable called _nimby_ which measures the difference in support for refugee resettlement in the US, vs. refugee resettlement in respondent's local community (US-L). Calculate the average value of _nimby_ separately for self-reported Republicans and Democrats, respectively. Interpret the results. Do the two means differ statistically, at the 99% level? 
+
+```{r}
+
+
+```
+
+2.5. We will now use regression to test multiple possible predictors of NIMBYism. First, run a bivariate regression in which the dependent variable is _nimby_ and the independent variable is _above_median_income_. Interpret the coefficient on above_median_income, as well as either the t-statistic. Based on these results, do respondents with higher incomes differ with respect to NIMBYism?
+
+```{r}
+
+```
+
+2.6. Add all demographic factors in the dataset to the regression from the previous step. Evaluate the results of the multivariate regression. Do any of these factors predict differences in NIMBYism, at the 95% level? What does this suggest about the prevalence of NIMBYism among US citizens? You do not need to interpret the individual coefficients. 
+
+```{r}
+
+```
+
+
+
+
+
