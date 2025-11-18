@@ -1,0 +1,235 @@
+---
+title: "Class 18"
+format: docx
+execute:
+  error: TRUE
+---
+
+# Plan
+* Hypothesis testing + p-values (lecture)
+* Visualizing hypothesis testing in R
+* Group work review
+* Quick practice (conceptual)
+* Regression tables (lecture)
+* Group Project Results
+* Review session
+
+# Lecture: Hypothesis testing 
+
+# Visualizing the null hypothesis 
+
+```{r}
+library(tidyverse)
+# Do not need to know the plotting code -- just a demonstration!
+
+resume <- read.csv("./class_data/resume.csv")
+chechen <- read.csv("./class_data/chechen.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/resume.csv","resume.csv")
+#resume <- read.csv("resume.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/chechen.csv","chechen.csv")
+#chechen <- read.csv("chechen.csv")
+
+###### REJECTING THE NULL
+
+resume_b <- resume |> filter(race=="black")
+resume_w <- resume |> filter(race=="white")
+t.test(resume_b$call,resume_w$call,conf.level=.95)
+
+# or
+out <- t.test(call ~ race, data=resume)
+out
+t <- out$statistic
+
+#### Plot
+n  <- nrow(resume)
+conflevel = .95
+x <- seq(-8, 8, length=100)
+plot(x,dt(x,n-1),lty=1,type="l",xlab="Standard Deviations of Sampling Distribution (Centered on 0)")
+abline(v=qt((1-conflevel)/2,n-1)*-1,col="red")
+abline(v=qt((1-conflevel)/2,n-1),col="red")
+abline(v=t,col="blue")
+
+result <- lm(call ~ race, data=resume)
+summary(result)
+confint(result)
+
+```
+
+```{r}
+###### FAIL TO REJECT THE NULL
+
+out <- t.test(postattack ~ fire, data=chechen)
+out
+t <- out$statistic
+
+#### Plot
+n  <- nrow(chechen)
+conflevel = .95
+x <- seq(-8, 8, length=100)
+plot(x,dt(x,n-1),lty=1,type="l",xlab="Standard Deviations of Sampling Distribution (Centered on 0)")
+abline(v=qt((1-conflevel)/2,n-1)*-1,col="red")
+abline(v=qt((1-conflevel)/2,n-1),col="red")
+abline(v=t,col="blue")
+
+
+result <- lm(postattack ~ fire, data=chechen)
+summary(result)
+confint(result)
+
+```
+
+
+# Lecture: p-values
+
+# Review of group work
+
+```{r}
+library(tidyverse)
+
+boston <- read.csv("./problem_sets/data/boston.csv")
+
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/refs/heads/main/problem_sets/data/boston.csv","boston.csv")
+#boston <- read.csv("boston.csv")
+
+```
+
+Evaluate whether individuals in the treated and control group are comparable with respect to background characteristics (i.e., the difference in means is 0), using a 95% confidence level. The background characteristics are: age, income, male, white, college, usborn, partisanship.
+
+For any characteristic, do we reject the possibility that the difference between the treated and control averages is 0? What does this imply about the quality of the randomization?
+
+```{r}
+# Different ways to do this:
+
+# Age
+summary(lm(age~treated,data=boston))
+t.test(age~treated,data=boston)
+
+# If we have multiple groups:
+boston_t <- boston |> filter(treated==1)
+boston_c <- boston |> filter(treated==0)
+t.test(boston_t$age,boston_c$age,data=boston)
+
+
+# Usborn
+summary(lm(usborn~treated,data=boston))
+t.test(usborn~treated,data=boston)
+t.test(boston_t$usborn,boston_c$usborn,data=boston)
+
+```
+
+Re-evaluate the Kenyan savings experiments:
+
+```{r}
+library(tidyverse)
+kenya <- read.csv("./class_data/rosca2.csv")
+#download.file("https://raw.githubusercontent.com/resonance1/govt10-f25/main/class_data/rosca2.csv","rosca2.csv")
+#kenya <- read.csv("rosca2.csv")
+kenya <- subset(kenya,has_followup2 == 1)
+```
+
+Variables:
+fol2_amtinvest  Amount invested in Kenyan shillings, in Wave 2 (outcome)
+encouragement   Binary variable indicating whether individuals are in the control group (1) or not (0)
+safe_box        Binary variable indicating whether individuals are in the safe deposit box treatment group (1) or not (0)
+locked_box      Binary variable indicating whether individuals are in the locked box treatment group (1) or not (0)
+bg_b1_age       age of participant
+bg_female       gender of participant
+bg_married      marital status of participant
+
+Calculate the t-statistic (at the 95% level) for the null hypothesis that the difference in fol2_amtinvest between the locked box group and the control group is 0. Repeat for the safe box group. 
+ 
+```{r}
+# Note: since we have multiple treatment conditions, it is better to filter and then use t.test
+
+lb <- kenya |> filter(locked_box == 1)
+sb <- kenya |> filter(safe_box == 1)
+c <- kenya |> filter(encouragement == 1)
+
+t.test(lb$fol2_amtinvest, c$fol2_amtinvest)
+# fail to reject (statistically insignificant)
+
+t.test(sb$fol2_amtinvest, c$fol2_amtinvest)
+# reject (statistically significant)
+
+# Alternative using lm(). The t values will differ here due to a difference in degrees of freedom; conclusions remain unchanged
+result <-lm(fol2_amtinvest ~ locked_box + safe_box,data=kenya)
+summary(result)
+
+```
+
+Now evaluate balance between the treated and control conditions with respect to age, gender, and marital status, at the 95% confidence level. Note: since there are two treatment conditions, you will have to evaluate the balance of each treatment relative to control. The easiest way to do this is with a t-test, but you could also use regression if you created datasets that exclude the other treatment group.
+
+For any characteristic, at 95% confidence do we reject the possibility that the difference between the treated and control averages is 0? What does this imply about the quality of the randomization?
+
+```{r}
+# Locked box
+t.test(lb$bg_b1_age, c$bg_b1_age)
+t.test(lb$bg_married, c$bg_married)
+t.test(lb$bg_female, c$bg_female)
+# Fail to reject at 95% level for all
+
+# Safe box
+t.test(sb$bg_b1_age, c$bg_b1_age)
+t.test(sb$bg_married, c$bg_married)
+t.test(sb$bg_female, c$bg_female)
+
+# Fail to reject at 95% level for all; but would reject at
+# 90% confidence for age
+
+# Overall, the groups are well balanced (good randomization)
+```
+
+
+# Quick Practice
+
+1. You are evaluating an RCT and examining whether the treated and control groups are similar with respect to background characteristics. You conduct
+a hypothesis test where you hypothesize that the difference in the share of females in each group is 0. Evaluating the hypothesis test, you see a p-value of 0.4
+
+Do you reject or fail to reject the null hypothesis?
+
+What does this imply about the quality of randomization for this variable?
+
+2. Your friend Brunhilda tests another variable (age), evaluating the null hypothesis that the difference in average age between the treated and control groups is 0. She receives a t-statistic of 4. The sample size for the RCT is 2000. 
+
+Do you reject or fail to reject the null hypothesis?
+
+What does this imply about the quality of randomization for this variable?
+
+3. Now you examine the ATE. The 95% confidence interval for the ATE is -0.04 to -0.01. Do you reject or fail to reject the null hypothesis of no effect, at the 95% level?
+
+4. You examine a different study. The p-value on the ATE is .02. Is the finding statistically significant at the 95% level?
+
+# Lecture: Regression tables
+
+# Group Project Results
+
+# Final logistics
+
+In-person exam: 1 hr 30 mins (Monday 11:30am, this room)
+Take-home exam: 45 mins (posted by Fri)
+
+# Review session (conceptual problems)
+
+### Scratchpad for conceptual problems
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
